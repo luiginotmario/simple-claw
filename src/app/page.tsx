@@ -109,11 +109,11 @@ export default function Home() {
                       onClick={() => toggleSkill(skill.id)}
                       className={`flex items-center gap-4 p-3 rounded-xl border transition-all duration-300 ${
                         isSelected 
-                          ? 'bg-white/20 border-white/40 shadow-inner' 
-                          : 'bg-white/5 border-white/10 hover:bg-white/10'
+                          ? 'glass shadow-inner' 
+                          : 'bg-[rgba(255,255,255,0.05)] border-[rgba(255,255,255,0.1)] hover:bg-[rgba(255,255,255,0.1)]'
                       }`}
                     >
-                      <div className={`p-2 rounded-lg ${isSelected ? 'bg-white/20' : 'bg-white/5'}`}>
+                      <div className={`p-2 rounded-lg ${isSelected ? 'bg-[rgba(255,255,255,0.2)]' : 'bg-[rgba(255,255,255,0.05)]'}`}>
                         <Icon className="w-5 h-5" />
                       </div>
                       <div className="flex-1 text-left">
