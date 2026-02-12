@@ -35,9 +35,6 @@ export default function Home() {
     
     setIsLoading(true);
     
-    // Simulate API call to mock endpoint
-    // In real scenario: const res = await fetch('/api/provision', { ... });
-    
     try {
       // Mock API call locally for frontend demo
       await new Promise(resolve => setTimeout(resolve, 2000));
@@ -60,11 +57,11 @@ export default function Home() {
         
         {/* Header */}
         <div className="text-center space-y-2">
-          <div className="mx-auto bg-white/20 p-3 rounded-full w-16 h-16 flex items-center justify-center mb-4">
+          <div className="mx-auto bg-[rgba(255,255,255,0.2)] p-3 rounded-full w-16 h-16 flex items-center justify-center mb-4">
             <Zap className="w-8 h-8 text-yellow-300" />
           </div>
           <h1 className="text-3xl font-bold tracking-tight">SimpleClaw</h1>
-          <p className="text-white/70 text-sm">Your AI Assistant, configured in seconds.</p>
+          <p className="text-[rgba(255,255,255,0.7)] text-sm">Your AI Assistant, configured in seconds.</p>
         </div>
 
         {!isProvisioned ? (
@@ -118,7 +115,7 @@ export default function Home() {
                       </div>
                       <div className="flex-1 text-left">
                         <div className="font-medium text-sm">{skill.name}</div>
-                        <div className="text-xs text-white/50">{skill.description}</div>
+                        <div className="text-xs text-[rgba(255,255,255,0.5)]">{skill.description}</div>
                       </div>
                       {isSelected && <CheckCircle className="w-5 h-5 text-green-300" />}
                     </button>
@@ -131,21 +128,21 @@ export default function Home() {
             <button
               onClick={handleProvision}
               disabled={isLoading}
-              className="w-full py-3 bg-white text-black font-semibold rounded-xl hover:bg-white/90 active:scale-95 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+              className="w-full py-3 bg-white text-black font-semibold rounded-xl hover:bg-[rgba(255,255,255,0.9)] active:scale-95 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {isLoading ? 'Provisioning...' : 'Create Assistant'}
             </button>
           </div>
         ) : (
           <div className="space-y-6 text-center animate-in zoom-in duration-500">
-            <div className="bg-green-500/20 text-green-300 p-4 rounded-xl border border-green-500/30">
+            <div className="bg-[rgba(34,197,94,0.2)] text-green-300 p-4 rounded-xl border border-[rgba(34,197,94,0.3)]">
               <CheckCircle className="w-8 h-8 mx-auto mb-2" />
               <h3 className="text-lg font-bold">Assistant Ready!</h3>
               <p className="text-sm opacity-80">Your OpenClaw instance is provisioned.</p>
             </div>
 
-            <div className="p-4 bg-white/5 rounded-xl border border-white/10 text-left space-y-2">
-              <div className="text-xs uppercase tracking-wider text-white/40 font-bold">Details</div>
+            <div className="p-4 bg-[rgba(255,255,255,0.05)] rounded-xl border border-[rgba(255,255,255,0.1)] text-left space-y-2">
+              <div className="text-xs uppercase tracking-wider text-[rgba(255,255,255,0.4)] font-bold">Details</div>
               <div className="flex justify-between text-sm">
                 <span className="opacity-70">Name:</span>
                 <span className="font-mono">{userName}</span>
@@ -158,7 +155,7 @@ export default function Home() {
 
             <button
               onClick={() => alert('Redirecting to WhatsApp...')}
-              className="w-full py-3 bg-[#25D366] text-white font-bold rounded-xl hover:bg-[#20bd5a] flex items-center justify-center gap-2 transition-all shadow-lg hover:shadow-green-500/20"
+              className="w-full py-3 bg-[#25D366] text-white font-bold rounded-xl hover:bg-[#20bd5a] flex items-center justify-center gap-2 transition-all shadow-lg hover:shadow-[rgba(34,197,94,0.2)]"
             >
               <Smartphone className="w-5 h-5" />
               Connect on WhatsApp
@@ -166,7 +163,7 @@ export default function Home() {
             
             <button 
               onClick={() => setIsProvisioned(false)}
-              className="text-sm text-white/50 hover:text-white underline"
+              className="text-sm text-[rgba(255,255,255,0.5)] hover:text-white underline"
             >
               Start Over
             </button>
@@ -174,7 +171,7 @@ export default function Home() {
         )}
       </main>
       
-      <footer className="mt-8 text-xs text-white/30">
+      <footer className="mt-8 text-xs text-[rgba(255,255,255,0.3)]">
         &copy; 2024 Voltaic Studio via SimpleClaw
       </footer>
     </div>
