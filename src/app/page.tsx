@@ -115,8 +115,9 @@ export default function Home() {
             transition={{ delay: 0.2 }}
             className="text-lg md:text-xl text-[var(--muted)] max-w-2xl mx-auto mb-12 leading-relaxed"
           >
-            The personal AI that integrates with everything. It manages your calendar, 
-            watches your health, and executes your ideas. An assistant that actually does things.
+            Your life operating system, where you can hold everything you want to share with your own private & secure personal assistant.
+            <br className="hidden md:block" />
+            <span className="text-[var(--foreground)] mt-2 block">No apps to open. Just chat.</span>
           </motion.p>
 
           <motion.div 
