@@ -89,7 +89,7 @@ export default function Onboarding() {
                   </div>
                   {intelligence === 'standard' && <Check className="w-5 h-5 text-[var(--foreground)]" />}
                 </div>
-                <h3 className="text-xl font-semibold mb-1 text-[var(--foreground)]">Meta AI</h3>
+                <h3 className="text-xl font-semibold mb-1 text-[var(--foreground)]">Default Model</h3>
                 <p className="text-sm text-[var(--muted)]">Fast, reliable, and included in your plan.</p>
               </button>
 
@@ -143,8 +143,14 @@ export default function Onboarding() {
                       placeholder="sk-..." 
                       value={customKey}
                       onChange={(e) => setCustomKey(e.target.value)}
-                      className="w-full bg-[var(--background)] border border-[var(--border)] rounded-lg px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-[var(--foreground)]"
+                      className="w-full bg-[var(--background)] border border-[var(--border)] rounded-lg px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-[var(--foreground)] mb-2"
                     />
+                    <button
+                      onClick={() => setCustomKey('SKIPPED')}
+                      className="text-xs text-[var(--muted)] hover:text-[var(--foreground)] underline"
+                    >
+                      I'll add this later
+                    </button>
                   </div>
                 </motion.div>
               )}
