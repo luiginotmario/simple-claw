@@ -84,77 +84,100 @@ export default function Home() {
         </div>
       </nav>
 
-      <main className="pt-40 pb-20 px-6 max-w-7xl mx-auto">
+      <main className="pt-32 pb-20 px-6 max-w-7xl mx-auto flex flex-col items-center">
         
-        {/* Split Hero Section */}
-        <div className="flex flex-col lg:flex-row items-center gap-16 lg:gap-8 mb-40">
+        {/* Hero Section (Centered) */}
+        <div className="text-center max-w-4xl mx-auto mb-32">
+          <motion.div 
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[var(--glass-bg)] border border-[var(--glass-border)] text-xs font-medium text-[var(--muted)] mb-8"
+          >
+            <span className="relative flex h-2 w-2">
+              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
+              <span className="relative inline-flex rounded-full h-2 w-2 bg-green-500"></span>
+            </span>
+            System Online
+          </motion.div>
+
+          <motion.h1 
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.1 }}
+            className="text-5xl md:text-8xl font-bold tracking-tighter leading-[0.95] mb-8 bg-gradient-to-b from-[var(--foreground)] to-[var(--muted)] bg-clip-text text-transparent"
+          >
+            Your Life.<br />Your Assistant.
+          </motion.h1>
+
+          <motion.p 
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.2 }}
+            className="text-lg md:text-xl text-[var(--muted)] max-w-2xl mx-auto mb-12 leading-relaxed"
+          >
+            The personal AI that integrates with everything. It manages your calendar, 
+            watches your health, and executes your ideas. An assistant that actually does things.
+          </motion.p>
+
+          <motion.div 
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.3 }}
+            className="flex flex-col sm:flex-row gap-4 justify-center"
+          >
+            <Link 
+              href="/onboarding"
+              className="group relative inline-flex items-center justify-center gap-2 px-8 py-4 bg-[var(--foreground)] text-[var(--background)] rounded-full font-semibold text-lg hover:opacity-90 transition-all active:scale-95"
+            >
+              Start Your Life OS
+              <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
+            </Link>
+            
+            <button className="px-8 py-4 bg-[var(--glass-bg)] text-[var(--foreground)] border border-[var(--glass-border)] rounded-full font-semibold text-lg hover:bg-[var(--glass-border)] transition-all">
+              See How It Works
+            </button>
+          </motion.div>
+        </div>
+
+        {/* Feature Section: The Interface (Split View) */}
+        <div className="w-full grid grid-cols-1 lg:grid-cols-2 gap-16 items-center mb-40 text-left">
           
-          {/* Left: Text Content */}
-          <div className="flex-1 text-center lg:text-left space-y-8 max-w-2xl">
-            <motion.div 
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[var(--glass-bg)] border border-[var(--glass-border)] text-xs font-medium text-[var(--muted)]"
-            >
-              <span className="relative flex h-2 w-2">
-                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
-                <span className="relative inline-flex rounded-full h-2 w-2 bg-green-500"></span>
-              </span>
-              System Online
-            </motion.div>
-
-            <motion.h1 
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.1 }}
-              className="text-5xl md:text-7xl lg:text-8xl font-bold tracking-tighter leading-[0.95]"
-            >
-              Your Life.<br />
-              <span className="text-[var(--muted)]">Your Assistant.</span>
-            </motion.h1>
-
-            <motion.p 
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.2 }}
-              className="text-lg md:text-xl text-[var(--muted)] leading-relaxed max-w-lg mx-auto lg:mx-0"
-            >
-              The personal AI that lives in your chat app. It manages your calendar, 
-              watches your health, and executes your ideas.
-              <br className="hidden md:block" />
-              <span className="text-[var(--foreground)] mt-2 block">No apps to open. Just chat.</span>
-            </motion.p>
-
-            <motion.div 
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.3 }}
-              className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start"
-            >
-              <Link 
-                href="/onboarding"
-                className="group relative inline-flex items-center justify-center gap-2 px-8 py-4 bg-[var(--foreground)] text-[var(--background)] rounded-full font-semibold text-lg hover:opacity-90 transition-all active:scale-95"
-              >
-                Start Your Life OS
-                <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
-              </Link>
-              
-              <button className="px-8 py-4 bg-[var(--glass-bg)] text-[var(--foreground)] border border-[var(--glass-border)] rounded-full font-semibold text-lg hover:bg-[var(--glass-border)] transition-all">
-                See How It Works
-              </button>
-            </motion.div>
+          {/* Left: Description */}
+          <div className="space-y-8 order-2 lg:order-1">
+            <h2 className="text-3xl md:text-5xl font-bold text-[var(--foreground)] leading-tight">
+              It lives where <br/> you chat.
+            </h2>
+            <div className="space-y-6 text-lg text-[var(--muted)]">
+              <p>
+                No new apps to learn. Life OS integrates directly into <strong>iMessage, WhatsApp, and Telegram</strong>.
+              </p>
+              <ul className="space-y-4">
+                <li className="flex items-center gap-3">
+                  <div className="w-6 h-6 rounded-full bg-green-500/20 flex items-center justify-center text-green-500"><Check className="w-3 h-3" /></div>
+                  <span>Natural language commands</span>
+                </li>
+                <li className="flex items-center gap-3">
+                  <div className="w-6 h-6 rounded-full bg-blue-500/20 flex items-center justify-center text-blue-500"><Check className="w-3 h-3" /></div>
+                  <span>Proactive notifications</span>
+                </li>
+                <li className="flex items-center gap-3">
+                  <div className="w-6 h-6 rounded-full bg-purple-500/20 flex items-center justify-center text-purple-500"><Check className="w-3 h-3" /></div>
+                  <span>Context-aware suggestions</span>
+                </li>
+              </ul>
+            </div>
           </div>
 
           {/* Right: iPhone Mockup */}
           <motion.div 
-            style={{ y: yHero }}
             initial={{ opacity: 0, scale: 0.95 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ delay: 0.4, duration: 0.8 }}
-            className="flex-1 w-full max-w-sm lg:max-w-md relative"
+            whileInView={{ opacity: 1, scale: 1 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.8 }}
+            className="w-full max-w-sm mx-auto relative order-1 lg:order-2"
           >
             {/* CSS iPhone 15 Pro Frame */}
-            <div className="relative mx-auto border-[10px] border-[#1a1a1a] dark:border-[#2a2a2a] bg-[#1a1a1a] dark:bg-[#2a2a2a] rounded-[3.5rem] h-[750px] w-[360px] shadow-2xl flex flex-col overflow-hidden ring-1 ring-white/10">
+            <div className="relative mx-auto border-[10px] border-[#1a1a1a] dark:border-[#2a2a2a] bg-[#1a1a1a] dark:bg-[#2a2a2a] rounded-[3.5rem] h-[750px] w-full shadow-2xl flex flex-col overflow-hidden ring-1 ring-white/10">
               {/* Screen */}
               <div className="h-full w-full bg-[var(--background)] rounded-[2.5rem] overflow-hidden relative flex flex-col">
                 
@@ -187,8 +210,8 @@ export default function Home() {
                   {/* Agent Msg 1 */}
                   <motion.div 
                     initial={{ opacity: 0, y: 10, scale: 0.95 }}
-                    animate={{ opacity: 1, y: 0, scale: 1 }}
-                    transition={{ delay: 0.5 }}
+                    whileInView={{ opacity: 1, y: 0, scale: 1 }}
+                    transition={{ delay: 0.2 }}
                     className="self-start max-w-[85%]"
                   >
                     <div className="bg-[#e9e9eb] dark:bg-[#262626] text-black dark:text-white rounded-2xl rounded-tl-sm px-4 py-2.5 text-sm leading-snug shadow-sm">
@@ -252,16 +275,6 @@ export default function Home() {
 
               </div>
             </div>
-            
-            {/* Context Label (Desktop Only) */}
-            <div className="hidden lg:block absolute -right-24 top-1/3 text-left w-48">
-              <div className="text-xs font-mono text-[var(--muted)] mb-2">LIVE DEMO</div>
-              <p className="text-sm text-[var(--foreground)] font-medium">
-                The agent detects context from your connected apps (Oura, Calendar) instantly.
-              </p>
-              <div className="h-px w-12 bg-[var(--foreground)] mt-4" />
-            </div>
-
           </motion.div>
         </div>
 
