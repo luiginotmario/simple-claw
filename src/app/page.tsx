@@ -1,10 +1,44 @@
 'use client';
 
-import { motion } from 'framer-motion';
-import { ArrowRight, Check, Zap } from 'lucide-react';
+import { motion, useScroll, useTransform } from 'framer-motion';
+import { ArrowRight, Calendar, Check, Zap, Activity, Clock, MapPin, MessageCircle } from 'lucide-react';
 import Link from 'next/link';
+import { useState, useEffect } from 'react';
+
+const TypingIndicator = () => (
+  <div className="flex gap-1 px-2 py-1">
+    <motion.div 
+      className="w-1.5 h-1.5 bg-[var(--muted)] rounded-full"
+      animate={{ y: [0, -3, 0] }}
+      transition={{ duration: 0.6, repeat: Infinity, delay: 0 }}
+    />
+    <motion.div 
+      className="w-1.5 h-1.5 bg-[var(--muted)] rounded-full"
+      animate={{ y: [0, -3, 0] }}
+      transition={{ duration: 0.6, repeat: Infinity, delay: 0.2 }}
+    />
+    <motion.div 
+      className="w-1.5 h-1.5 bg-[var(--muted)] rounded-full"
+      animate={{ y: [0, -3, 0] }}
+      transition={{ duration: 0.6, repeat: Infinity, delay: 0.4 }}
+    />
+  </div>
+);
 
 export default function Home() {
+  const { scrollY } = useScroll();
+  const y1 = useTransform(scrollY, [0, 500], [0, 100]);
+  const y2 = useTransform(scrollY, [0, 500], [0, -100]);
+
+  const [chatStep, setChatStep] = useState(0);
+
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setChatStep((prev) => (prev + 1) % 4);
+    }, 4000);
+    return () => clearInterval(timer);
+  }, []);
+
   return (
     <div className="min-h-screen bg-[var(--background)] text-[var(--foreground)] selection:bg-[var(--accent)]/20 overflow-x-hidden font-sans transition-colors duration-300">
       
@@ -23,7 +57,7 @@ export default function Home() {
 
       <main className="pt-32 pb-20 px-6 max-w-7xl mx-auto flex flex-col items-center text-center">
         
-        {/* Hero Badge */}
+        {/* Hero Section */}
         <motion.div 
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
@@ -33,31 +67,28 @@ export default function Home() {
             <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
             <span className="relative inline-flex rounded-full h-2 w-2 bg-green-500"></span>
           </span>
-          Early Access Available
+          System Online
         </motion.div>
 
-        {/* Hero Title */}
         <motion.h1 
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.1 }}
           className="text-5xl md:text-8xl font-bold tracking-tighter leading-[0.95] mb-8 bg-gradient-to-b from-[var(--foreground)] to-[var(--muted)] bg-clip-text text-transparent"
         >
-          Your Life.<br />On Autopilot.
+          Your Life.<br />Your Assistant.
         </motion.h1>
 
-        {/* Hero Subtitle */}
         <motion.p 
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.2 }}
           className="text-lg md:text-xl text-[var(--muted)] max-w-2xl mb-12 leading-relaxed"
         >
-          The personal AI that lives in your WhatsApp. It manages your calendar, 
-          watches your health, and executes your ideas. No apps to open. Just chat.
+          The personal AI that integrates with everything. It manages your calendar, 
+          watches your health, and executes your ideas. An assistant that actually does things.
         </motion.p>
 
-        {/* CTA Buttons */}
         <motion.div 
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -73,96 +104,164 @@ export default function Home() {
           </Link>
           
           <button className="px-8 py-4 bg-[var(--glass-bg)] text-[var(--foreground)] border border-[var(--glass-border)] rounded-2xl font-semibold text-lg hover:bg-[var(--glass-border)] transition-all">
-            See How It Works
+            See the Magic
           </button>
         </motion.div>
 
-        {/* Visual / Demo Placeholder (Monaco-style card) */}
+        {/* Demo: Chat Interface */}
         <motion.div 
           initial={{ opacity: 0, scale: 0.95 }}
           animate={{ opacity: 1, scale: 1 }}
           transition={{ delay: 0.4, duration: 0.8 }}
-          className="mt-24 w-full max-w-4xl relative"
+          className="mt-32 w-full max-w-md mx-auto relative"
         >
-          <div className="absolute inset-0 bg-gradient-to-t from-[var(--background)] via-transparent to-transparent z-10 h-full w-full pointer-events-none" />
-          
-          <div className="rounded-3xl border border-[var(--glass-border)] bg-[var(--card)] p-4 md:p-8 shadow-2xl overflow-hidden relative group text-left">
-            {/* The "Card" UI */}
-            <div className="flex flex-col md:flex-row gap-8 items-start">
-              {/* Left: Chat Interface */}
-              <div className="w-full md:w-1/2 space-y-4">
-                <div className="flex items-start gap-3">
-                  <div className="w-8 h-8 rounded-full bg-[var(--glass-bg)] flex items-center justify-center text-xs text-[var(--foreground)]">Me</div>
-                  <div className="bg-[var(--glass-bg)] rounded-2xl rounded-tl-none p-4 text-sm text-[var(--foreground)] border border-[var(--glass-border)]">
-                    I need a dinner res for 4 tonight in SoHo, something Italian. 
-                    Also clear my schedule after 6pm.
-                  </div>
-                </div>
+          {/* iPhone Frame */}
+          <div className="rounded-[3rem] border-8 border-[var(--border)] bg-[var(--background)] shadow-2xl overflow-hidden relative aspect-[9/19]">
+            {/* Dynamic Island */}
+            <div className="absolute top-0 left-1/2 -translate-x-1/2 h-7 w-28 bg-black rounded-b-2xl z-20" />
+            
+            <div className="h-full w-full bg-[var(--background)] flex flex-col pt-12 pb-8 px-4 relative">
+              
+              {/* Messages Area */}
+              <div className="flex-1 space-y-4 overflow-hidden flex flex-col justify-end pb-4">
                 
-                <div className="flex items-start gap-3 flex-row-reverse">
-                  <div className="w-8 h-8 rounded-full bg-[var(--foreground)] flex items-center justify-center text-[var(--background)] font-bold">R</div>
-                  <div className="bg-[var(--accent)] text-[var(--accent-foreground)] rounded-2xl rounded-tr-none p-4 text-sm shadow-lg">
-                    Done.
-                    <br /><br />
-                    🍝 <strong>Carbone</strong> is fully booked, but I snagged a table at <strong>Bar Pitti</strong> for 7:30 PM.
-                    <br /><br />
-                    🗓️ I moved your "Gym" block to tomorrow morning to clear your evening.
+                {/* Message 1 */}
+                <motion.div 
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  className="flex justify-end"
+                >
+                  <div className="bg-[#007AFF] text-white rounded-2xl rounded-tr-sm px-4 py-2 text-sm max-w-[80%] shadow-sm">
+                    Move my 3pm meeting and book a table for 2 at Balthazar tonight.
                   </div>
+                </motion.div>
+
+                {/* Response 1 */}
+                <motion.div 
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 1 }}
+                  className="flex justify-start"
+                >
+                  <div className="bg-[var(--glass-bg)] border border-[var(--glass-border)] text-[var(--foreground)] rounded-2xl rounded-tl-sm px-4 py-2 text-sm max-w-[80%]">
+                    Done. Moved "Product Sync" to 4:30pm.
+                    <br /><br />
+                    Balthazar is confirmed for 8:00 PM. I added it to your calendar.
+                  </div>
+                </motion.div>
+
+                {/* Message 2 */}
+                <motion.div 
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: chatStep >= 1 ? 1 : 0, display: chatStep >= 1 ? 'flex' : 'none' }}
+                  transition={{ delay: 0.2 }}
+                  className="justify-end"
+                >
+                  <div className="bg-[#007AFF] text-white rounded-2xl rounded-tr-sm px-4 py-2 text-sm max-w-[80%] shadow-sm">
+                    Also, how did I sleep?
+                  </div>
+                </motion.div>
+
+                {/* Typing Indicator */}
+                <motion.div 
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: chatStep === 1 ? 1 : 0, display: chatStep === 1 ? 'flex' : 'none' }}
+                  className="justify-start"
+                >
+                  <div className="bg-[var(--glass-bg)] rounded-2xl rounded-tl-sm px-2 py-2 w-12">
+                    <TypingIndicator />
+                  </div>
+                </motion.div>
+
+                {/* Response 2 */}
+                <motion.div 
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: chatStep >= 2 ? 1 : 0, display: chatStep >= 2 ? 'flex' : 'none' }}
+                  className="justify-start"
+                >
+                  <div className="bg-[var(--glass-bg)] border border-[var(--glass-border)] text-[var(--foreground)] rounded-2xl rounded-tl-sm px-4 py-2 text-sm max-w-[80%]">
+                    Not great. Oura says 5h 42m. 
+                    <br /><br />
+                    I suggest canceling your morning run. Want me to clear your schedule until 10am?
+                  </div>
+                </motion.div>
+
+              </div>
+
+              {/* Input Area */}
+              <div className="h-10 rounded-full border border-[var(--glass-border)] flex items-center px-4 justify-between">
+                <span className="text-[var(--muted)] text-xs">iMessage</span>
+                <div className="w-6 h-6 rounded-full bg-[#007AFF] flex items-center justify-center">
+                  <ArrowRight className="w-3 h-3 text-white" />
                 </div>
               </div>
 
-              {/* Right: Actions/Integrations */}
-              <div className="w-full md:w-1/2 grid grid-cols-2 gap-3">
-                <div className="p-4 rounded-xl bg-[var(--glass-bg)] border border-[var(--glass-border)] flex flex-col gap-3">
-                  <div className="w-8 h-8 rounded-lg bg-green-500/20 flex items-center justify-center text-green-400">
-                    <Check className="w-5 h-5" />
-                  </div>
-                  <div className="text-sm font-medium text-[var(--foreground)]">Resy</div>
-                  <div className="text-xs text-[var(--muted)]">Confirmed • 7:30 PM</div>
-                </div>
-                
-                <div className="p-4 rounded-xl bg-[var(--glass-bg)] border border-[var(--glass-border)] flex flex-col gap-3">
-                  <div className="w-8 h-8 rounded-lg bg-orange-500/20 flex items-center justify-center text-orange-400">
-                    <Check className="w-5 h-5" />
-                  </div>
-                  <div className="text-sm font-medium text-[var(--foreground)]">Calendar</div>
-                  <div className="text-xs text-[var(--muted)]">Updated 2 events</div>
-                </div>
-
-                <div className="col-span-2 p-4 rounded-xl bg-[var(--glass-bg)] border border-[var(--glass-border)] flex items-center justify-between">
-                  <div className="flex items-center gap-3">
-                    <div className="w-8 h-8 rounded-lg bg-[var(--glass-bg)] flex items-center justify-center text-[var(--foreground)]">
-                      <Zap className="w-4 h-4" />
-                    </div>
-                    <div className="text-sm font-medium text-[var(--foreground)]">Auto-Pilot Active</div>
-                  </div>
-                  <div className="h-2 w-2 rounded-full bg-green-500 shadow-[0_0_10px_rgba(34,197,94,0.5)]" />
-                </div>
-              </div>
             </div>
           </div>
         </motion.div>
 
-        {/* Feature Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mt-32 w-full">
-          {[
-            { title: "Connects Everything", desc: "Uber, Oura, Gmail, Notion. It connects to your apps so you don't have to." },
-            { title: "Runs 24/7", desc: "It never sleeps. It monitors your health data and emails while you rest." },
-            { title: "Private Brain", desc: "Your data lives in your private container. We don't train on your life." }
-          ].map((feature, i) => (
-            <motion.div 
-              key={i}
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ delay: 0.1 * i }}
-              className="p-6 rounded-2xl bg-[var(--glass-bg)] border border-[var(--glass-border)] hover:border-[var(--border)] transition-colors text-left"
-            >
-              <h3 className="text-xl font-semibold mb-2 text-[var(--foreground)]">{feature.title}</h3>
-              <p className="text-[var(--muted)] leading-relaxed">{feature.desc}</p>
-            </motion.div>
-          ))}
-        </div>
+        {/* Feature: Background Intelligence (Flighty Style) */}
+        <section className="w-full mt-40 mb-20 text-left">
+          <div className="max-w-3xl mx-auto">
+            <h2 className="text-3xl md:text-5xl font-bold mb-6 text-[var(--foreground)]">Works while you sleep.</h2>
+            <p className="text-xl text-[var(--muted)] mb-12">
+              Most assistants wait for you to ask. Life OS works in the background, connecting dots you didn't even see.
+            </p>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              
+              {/* Card 1: Live Activity */}
+              <motion.div 
+                whileHover={{ y: -5 }}
+                className="p-6 rounded-3xl bg-[var(--glass-bg)] border border-[var(--glass-border)] overflow-hidden relative"
+              >
+                <div className="absolute top-4 right-4">
+                  <Activity className="w-6 h-6 text-green-500" />
+                </div>
+                <h3 className="text-lg font-semibold mb-2 text-[var(--foreground)]">Proactive Health</h3>
+                <p className="text-sm text-[var(--muted)] mb-6">Detects poor sleep and automatically blocks focus time for recovery.</p>
+                
+                {/* Mock Widget */}
+                <div className="bg-black rounded-2xl p-4 text-white flex items-center justify-between shadow-lg border border-white/10">
+                  <div className="flex items-center gap-3">
+                    <div className="w-10 h-10 bg-gray-800 rounded-full flex items-center justify-center">
+                      <Zap className="w-5 h-5 text-yellow-400" />
+                    </div>
+                    <div>
+                      <div className="text-xs font-medium text-gray-400">Recovery Mode</div>
+                      <div className="text-sm font-bold">Meetings Cleared</div>
+                    </div>
+                  </div>
+                  <div className="text-2xl font-bold text-green-400">ON</div>
+                </div>
+              </motion.div>
+
+              {/* Card 2: Flighty Style Data */}
+              <motion.div 
+                whileHover={{ y: -5 }}
+                className="p-6 rounded-3xl bg-[var(--glass-bg)] border border-[var(--glass-border)]"
+              >
+                <div className="absolute top-4 right-4">
+                  <MapPin className="w-6 h-6 text-blue-500" />
+                </div>
+                <h3 className="text-lg font-semibold mb-2 text-[var(--foreground)]">Smart Travel</h3>
+                <p className="text-sm text-[var(--muted)] mb-6">Monitors flight delays and rebooks your Uber automatically.</p>
+                
+                <div className="space-y-3">
+                  <div className="flex justify-between items-center text-sm border-b border-[var(--glass-border)] pb-2">
+                    <span className="text-[var(--muted)]">UA 145</span>
+                    <span className="text-red-500 font-medium">Delayed +45m</span>
+                  </div>
+                  <div className="flex justify-between items-center text-sm">
+                    <span className="text-[var(--muted)]">Uber Pickup</span>
+                    <span className="text-[var(--foreground)]">Updated to 10:15 PM</span>
+                  </div>
+                </div>
+              </motion.div>
+
+            </div>
+          </div>
+        </section>
 
       </main>
     </div>
