@@ -1,41 +1,79 @@
 @import "tailwindcss";
 
 :root {
-  --background: #0f172a;
-  --foreground: #f8fafc;
+  /* Light Mode (Default) */
+  --background: #ffffff;
+  --foreground: #09090b;
+  --card: #f4f4f5;
+  --card-foreground: #09090b;
+  --border: #e4e4e7;
+  --glass-bg: rgba(0, 0, 0, 0.05);
+  --glass-border: rgba(0, 0, 0, 0.1);
+  --accent: #000000;
+  --accent-foreground: #ffffff;
+  --muted: #71717a;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    /* Dark Mode */
+    --background: #050505;
+    --foreground: #ffffff;
+    --card: #0a0a0a;
+    --card-foreground: #ffffff;
+    --border: #27272a;
+    --glass-bg: rgba(255, 255, 255, 0.05);
+    --glass-border: rgba(255, 255, 255, 0.1);
+    --accent: #ffffff;
+    --accent-foreground: #000000;
+    --muted: #a1a1aa;
+  }
 }
 
 body {
-  background: linear-gradient(135deg, #4f46e5 0%, #ec4899 100%);
+  background-color: var(--background);
   color: var(--foreground);
   font-family: Arial, Helvetica, sans-serif;
   min-height: 100vh;
+  transition: background-color 0.3s, color 0.3s;
 }
 
+/* Utilities */
 @utility glass {
-  background-color: rgb(255 255 255 / 0.1);
+  background-color: var(--glass-bg);
   backdrop-filter: blur(12px);
-  border: 1px solid rgb(255 255 255 / 0.2);
-  box-shadow: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);
+  border: 1px solid var(--glass-border);
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
 }
 
 @utility input-glass {
-  background-color: rgb(255 255 255 / 0.05);
-  border: 1px solid rgb(255 255 255 / 0.1);
+  background-color: var(--glass-bg);
+  border: 1px solid var(--glass-border);
   border-radius: 0.5rem;
   padding: 0.5rem 1rem;
-  color: white;
+  color: var(--foreground);
   outline: 2px solid transparent;
   outline-offset: 2px;
+  transition: all 0.2s;
 
   &:focus {
-    --tw-ring-offset-shadow: var(--tw-ring-inset) 0 0 0 var(--tw-ring-offset-width) var(--tw-ring-offset-color);
-    --tw-ring-shadow: var(--tw-ring-inset) 0 0 0 calc(2px + var(--tw-ring-offset-width)) var(--tw-ring-color);
-    box-shadow: var(--tw-ring-offset-shadow), var(--tw-ring-shadow), var(--tw-shadow, 0 0 #0000);
-    --tw-ring-color: rgb(255 255 255 / 0.3);
+    border-color: var(--accent);
+    box-shadow: 0 0 0 2px var(--glass-border);
   }
 
   &::placeholder {
-    color: rgb(255 255 255 / 0.5);
+    color: var(--muted);
   }
+}
+
+@utility text-muted {
+  color: var(--muted);
+}
+
+@utility bg-card {
+  background-color: var(--card);
+}
+
+@utility border-base {
+  border-color: var(--border);
 }

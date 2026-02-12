@@ -20,7 +20,7 @@ export default function Onboarding() {
   const nextStep = (next: Step) => setStep(next);
 
   return (
-    <div className="min-h-screen bg-[#050505] text-white flex flex-col items-center justify-center p-6 overflow-hidden">
+    <div className="min-h-screen bg-[var(--background)] text-[var(--foreground)] flex flex-col items-center justify-center p-6 overflow-hidden transition-colors duration-300">
       
       {/* Progress Bar */}
       <div className="fixed top-0 w-full p-8 flex justify-center gap-2">
@@ -31,8 +31,8 @@ export default function Onboarding() {
               step === s || 
               (step === 'interface' && i === 0) || 
               (step === 'ignition' && i <= 1) 
-              ? 'bg-white' 
-              : 'bg-white/10'
+              ? 'bg-[var(--foreground)]' 
+              : 'bg-[var(--glass-border)]'
             }`} 
           />
         ))}
@@ -50,8 +50,8 @@ export default function Onboarding() {
             className="max-w-2xl w-full space-y-8 text-center"
           >
             <div className="space-y-2">
-              <h2 className="text-4xl font-bold tracking-tight">Choose your Brain.</h2>
-              <p className="text-white/50 text-lg">How smart does your Life OS need to be?</p>
+              <h2 className="text-4xl font-bold tracking-tight text-[var(--foreground)]">Choose your Brain.</h2>
+              <p className="text-[var(--muted)] text-lg">How smart does your Life OS need to be?</p>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -59,44 +59,44 @@ export default function Onboarding() {
                 onClick={() => setIntelligence('standard')}
                 className={`p-6 rounded-2xl border text-left transition-all ${
                   intelligence === 'standard' 
-                    ? 'bg-white/10 border-white/40 ring-1 ring-white/40' 
-                    : 'bg-white/5 border-white/5 hover:bg-white/10'
+                    ? 'bg-[var(--glass-bg)] border-[var(--foreground)] ring-1 ring-[var(--foreground)]' 
+                    : 'bg-[var(--glass-bg)] border-[var(--glass-border)] hover:border-[var(--border)]'
                 }`}
               >
                 <div className="flex justify-between items-start mb-4">
                   <div className="p-2 bg-blue-500/20 rounded-lg text-blue-400">
                     <Zap className="w-6 h-6" />
                   </div>
-                  {intelligence === 'standard' && <Check className="w-5 h-5 text-white" />}
+                  {intelligence === 'standard' && <Check className="w-5 h-5 text-[var(--foreground)]" />}
                 </div>
-                <h3 className="text-xl font-semibold mb-1">Standard</h3>
-                <p className="text-sm text-white/50 mb-4">Perfect for daily tasks, calendar, and quick answers.</p>
-                <div className="text-xs font-mono text-white/30">Llama 3.1 • Fast</div>
+                <h3 className="text-xl font-semibold mb-1 text-[var(--foreground)]">Standard</h3>
+                <p className="text-sm text-[var(--muted)] mb-4">Perfect for daily tasks, calendar, and quick answers.</p>
+                <div className="text-xs font-mono text-[var(--muted)]">Llama 3.1 • Fast</div>
               </button>
 
               <button 
                 onClick={() => setIntelligence('genius')}
                 className={`p-6 rounded-2xl border text-left transition-all ${
                   intelligence === 'genius' 
-                    ? 'bg-white/10 border-white/40 ring-1 ring-white/40' 
-                    : 'bg-white/5 border-white/5 hover:bg-white/10'
+                    ? 'bg-[var(--glass-bg)] border-[var(--foreground)] ring-1 ring-[var(--foreground)]' 
+                    : 'bg-[var(--glass-bg)] border-[var(--glass-border)] hover:border-[var(--border)]'
                 }`}
               >
                 <div className="flex justify-between items-start mb-4">
                   <div className="p-2 bg-purple-500/20 rounded-lg text-purple-400">
                     <Brain className="w-6 h-6" />
                   </div>
-                  {intelligence === 'genius' && <Check className="w-5 h-5 text-white" />}
+                  {intelligence === 'genius' && <Check className="w-5 h-5 text-[var(--foreground)]" />}
                 </div>
-                <h3 className="text-xl font-semibold mb-1">Genius</h3>
-                <p className="text-sm text-white/50 mb-4">Reasoning capabilities for complex research and coding.</p>
-                <div className="text-xs font-mono text-white/30">GPT-4o / Claude • +$10/mo</div>
+                <h3 className="text-xl font-semibold mb-1 text-[var(--foreground)]">Genius</h3>
+                <p className="text-sm text-[var(--muted)] mb-4">Reasoning capabilities for complex research and coding.</p>
+                <div className="text-xs font-mono text-[var(--muted)]">GPT-4o / Claude • +$10/mo</div>
               </button>
             </div>
 
             <button 
               onClick={() => nextStep('interface')}
-              className="mt-8 px-8 py-4 bg-white text-black rounded-2xl font-semibold text-lg hover:bg-white/90 active:scale-95 transition-all inline-flex items-center gap-2"
+              className="mt-8 px-8 py-4 bg-[var(--foreground)] text-[var(--background)] rounded-2xl font-semibold text-lg hover:opacity-90 active:scale-95 transition-all inline-flex items-center gap-2"
             >
               Continue
               <ChevronRight className="w-5 h-5" />
@@ -114,8 +114,8 @@ export default function Onboarding() {
             className="max-w-xl w-full space-y-8 text-center"
           >
             <div className="space-y-2">
-              <h2 className="text-4xl font-bold tracking-tight">Where do we talk?</h2>
-              <p className="text-white/50 text-lg">Choose your primary communication channel.</p>
+              <h2 className="text-4xl font-bold tracking-tight text-[var(--foreground)]">Where do we talk?</h2>
+              <p className="text-[var(--muted)] text-lg">Choose your primary communication channel.</p>
             </div>
 
             <div className="space-y-3">
@@ -125,22 +125,22 @@ export default function Onboarding() {
                   onClick={() => setSelectedInterface(id as Interface)}
                   className={`w-full p-4 rounded-xl border flex items-center justify-between transition-all ${
                     selectedInterface === id 
-                      ? 'bg-white/10 border-white/40' 
-                      : 'bg-white/5 border-white/5 hover:bg-white/10'
+                      ? 'bg-[var(--glass-bg)] border-[var(--foreground)]' 
+                      : 'bg-[var(--glass-bg)] border-[var(--glass-border)] hover:border-[var(--border)]'
                   }`}
                 >
                   <div className="flex items-center gap-4">
-                    <div className="w-10 h-10 rounded-lg bg-white/5 flex items-center justify-center">
-                      <MessageCircle className="w-5 h-5 text-white/70" />
+                    <div className="w-10 h-10 rounded-lg bg-[var(--glass-bg)] flex items-center justify-center">
+                      <MessageCircle className="w-5 h-5 text-[var(--muted)]" />
                     </div>
                     <div className="text-left">
-                      <div className="font-medium capitalize">{id === 'imessage' ? 'iMessage' : id}</div>
-                      <div className="text-xs text-white/30">
+                      <div className="font-medium capitalize text-[var(--foreground)]">{id === 'imessage' ? 'iMessage' : id}</div>
+                      <div className="text-xs text-[var(--muted)]">
                         {id === 'whatsapp' ? 'Scan QR Code' : id === 'telegram' ? 'Start Bot' : 'Requires Mac Relay'}
                       </div>
                     </div>
                   </div>
-                  {selectedInterface === id && <Check className="w-5 h-5 text-white" />}
+                  {selectedInterface === id && <Check className="w-5 h-5 text-[var(--foreground)]" />}
                 </button>
               ))}
             </div>
@@ -150,7 +150,7 @@ export default function Onboarding() {
                 setIsProvisioning(true);
                 setTimeout(() => nextStep('ignition'), 3000);
               }}
-              className="mt-8 px-8 py-4 bg-white text-black rounded-2xl font-semibold text-lg hover:bg-white/90 active:scale-95 transition-all inline-flex items-center gap-2"
+              className="mt-8 px-8 py-4 bg-[var(--foreground)] text-[var(--background)] rounded-2xl font-semibold text-lg hover:opacity-90 active:scale-95 transition-all inline-flex items-center gap-2"
             >
               {isProvisioning ? 'Initializing...' : 'Create Life OS'}
               {!isProvisioning && <ChevronRight className="w-5 h-5" />}
@@ -168,31 +168,31 @@ export default function Onboarding() {
           >
             <div className="relative mx-auto w-32 h-32 flex items-center justify-center">
               <div className="absolute inset-0 bg-green-500/20 blur-3xl rounded-full animate-pulse" />
-              <div className="w-24 h-24 bg-white rounded-full flex items-center justify-center shadow-[0_0_40px_rgba(255,255,255,0.3)]">
-                <Check className="w-12 h-12 text-black" />
+              <div className="w-24 h-24 bg-[var(--card)] rounded-full flex items-center justify-center shadow-2xl border border-[var(--glass-border)]">
+                <Check className="w-12 h-12 text-[var(--foreground)]" />
               </div>
             </div>
 
             <div className="space-y-2">
-              <h2 className="text-3xl font-bold tracking-tight">System Online</h2>
-              <p className="text-white/50">Your Life OS is ready.</p>
+              <h2 className="text-3xl font-bold tracking-tight text-[var(--foreground)]">System Online</h2>
+              <p className="text-[var(--muted)]">Your Life OS is ready.</p>
             </div>
 
-            <div className="bg-white/5 border border-white/10 rounded-2xl p-6 text-left space-y-4">
+            <div className="bg-[var(--glass-bg)] border border-[var(--glass-border)] rounded-2xl p-6 text-left space-y-4">
               <div className="flex justify-between items-center text-sm">
-                <span className="text-white/50">Instance ID</span>
-                <span className="font-mono">life-os-8x92</span>
+                <span className="text-[var(--muted)]">Instance ID</span>
+                <span className="font-mono text-[var(--foreground)]">life-os-8x92</span>
               </div>
               <div className="flex justify-between items-center text-sm">
-                <span className="text-white/50">Intelligence</span>
-                <span className="capitalize">{intelligence}</span>
+                <span className="text-[var(--muted)]">Intelligence</span>
+                <span className="capitalize text-[var(--foreground)]">{intelligence}</span>
               </div>
-              <div className="h-px bg-white/10" />
+              <div className="h-px bg-[var(--glass-border)]" />
               <div className="flex gap-2">
-                <button className="flex-1 py-2 bg-white text-black rounded-lg text-sm font-semibold hover:bg-white/90">
+                <Link href="/dashboard" className="flex-1 py-2 bg-[var(--foreground)] text-[var(--background)] rounded-lg text-sm font-semibold hover:opacity-90 text-center flex items-center justify-center">
                   Open Dashboard
-                </button>
-                <button className="flex-1 py-2 bg-white/10 text-white rounded-lg text-sm font-semibold hover:bg-white/20">
+                </Link>
+                <button className="flex-1 py-2 bg-[var(--glass-bg)] text-[var(--foreground)] rounded-lg text-sm font-semibold hover:bg-[var(--glass-border)]">
                   Test Chat
                 </button>
               </div>
