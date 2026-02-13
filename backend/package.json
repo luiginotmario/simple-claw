@@ -1,0 +1,35 @@
+{
+  "name": "lifeos-backend",
+  "version": "1.0.0",
+  "type": "module",
+  "packageManager": "pnpm@9.14.4",
+  "scripts": {
+    "dev": "tsx watch src/index.ts",
+    "build": "tsc",
+    "start": "node dist/index.js",
+    "db:generate": "drizzle-kit generate",
+    "db:push": "drizzle-kit push",
+    "db:studio": "drizzle-kit studio"
+  },
+  "dependencies": {
+    "@hetzner/hetzner-cloud": "^1.0.0",
+    "@supabase/supabase-js": "^2.95.3",
+    "@hono/node-server": "^1.14.0",
+    "hono": "^4.6.14",
+    "drizzle-orm": "^0.36.4",
+    "postgres": "^3.4.5",
+    "stripe": "^17.5.0",
+    "cloudflare": "^3.5.0",
+    "axios": "^1.7.9",
+    "zod": "^3.24.1",
+    "dotenv": "^16.4.7",
+    "@axiomhq/js": "^1.2.0",
+    "nanoid": "^5.0.9"
+  },
+  "devDependencies": {
+    "@types/node": "^22.10.2",
+    "tsx": "^4.19.2",
+    "typescript": "^5.7.2",
+    "drizzle-kit": "^0.30.1"
+  }
+}

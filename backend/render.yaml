@@ -1,0 +1,38 @@
+services:
+  - type: web
+    name: lifeos-backend
+    runtime: node
+    region: oregon
+    plan: starter
+    buildCommand: pnpm install && pnpm build
+    startCommand: pnpm start
+    healthCheckPath: /health
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: 3001
+      - key: SUPABASE_URL
+        sync: false
+      - key: SUPABASE_SERVICE_ROLE_KEY
+        sync: false
+      - key: SUPABASE_ANON_KEY
+        sync: false
+      - key: HETZNER_API_TOKEN
+        sync: false
+      - key: CLOUDFLARE_API_TOKEN
+        sync: false
+      - key: CLOUDFLARE_ZONE_ID
+        sync: false
+      - key: CLOUDFLARE_DOMAIN
+        value: lifeos.app
+      - key: STRIPE_SECRET_KEY
+        sync: false
+      - key: STRIPE_WEBHOOK_SECRET
+        sync: false
+      - key: AXIOM_TOKEN
+        sync: false
+      - key: AXIOM_DATASET
+        value: lifeos-production
+      - key: ENCRYPTION_KEY
+        generateValue: true
