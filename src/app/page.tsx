@@ -1,9 +1,10 @@
 'use client';
 
 import { motion, useScroll, useTransform } from 'framer-motion';
-import { ArrowRight, Calendar, Check, Zap, Activity, Clock, MapPin, MessageCircle, FileText, Phone, Sun, Moon, Plus } from 'lucide-react';
+import { ArrowRight, Check, Zap, Activity, Clock, MapPin, MessageCircle, FileText, Phone, Sun, Moon, Plus, Star } from 'lucide-react';
 import Link from 'next/link';
 import { useState, useEffect } from 'react';
+import Image from 'next/image';
 
 const TypingIndicator = () => (
   <div className="flex gap-1 px-2 py-1.5 items-center h-full">
@@ -40,14 +41,13 @@ export default function Home() {
     }
 
     const timer = setInterval(() => {
-      setChatStep((prev) => (prev + 1) % 5); // Increased steps
+      setChatStep((prev) => (prev + 1) % 5); 
     }, 3500);
     return () => clearInterval(timer);
   }, []);
 
   const toggleTheme = () => {
     setIsDark(!isDark);
-    // Rough toggle implementation for demo - in real app use next-themes
     if (isDark) {
       document.documentElement.style.setProperty('--background', '#ffffff');
       document.documentElement.style.setProperty('--foreground', '#09090b');
@@ -69,14 +69,13 @@ export default function Home() {
     <div className={`min-h-screen bg-[var(--background)] text-[var(--foreground)] selection:bg-[var(--foreground)]/10 overflow-x-hidden font-sans transition-colors duration-500`}>
       
       {/* Navigation */}
-      <nav className="fixed top-0 w-full z-50 px-6 py-6 flex justify-between items-center bg-[var(--background)]/80 backdrop-blur-xl border-b border-[var(--border)] transition-colors duration-500">
+      <nav className="fixed top-0 w-full z-50 px-6 md:px-12 py-6 flex justify-between items-center bg-[var(--background)]/80 backdrop-blur-xl border-b border-[var(--border)] transition-colors duration-500">
         <div className="flex items-center gap-2">
           <div className="w-5 h-5 bg-[var(--foreground)] rounded-full" />
           <span className="font-semibold tracking-tight text-lg">Life OS</span>
         </div>
         <div className="flex items-center gap-6 text-sm font-medium text-[var(--muted)]">
-          <Link href="#" className="hover:text-[var(--foreground)] transition-colors hidden md:block">Manifesto</Link>
-          <Link href="#" className="hover:text-[var(--foreground)] transition-colors hidden md:block">Pricing</Link>
+          <Link href="/pricing" className="hover:text-[var(--foreground)] transition-colors hidden md:block">Pricing</Link>
           <button onClick={toggleTheme} className="p-2 rounded-full hover:bg-[var(--glass-bg)] transition-colors">
             {isDark ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
           </button>
@@ -84,7 +83,7 @@ export default function Home() {
         </div>
       </nav>
 
-      <main className="pt-32 pb-20 px-6 max-w-7xl mx-auto flex flex-col items-center">
+      <main className="pt-32 pb-20 px-6 md:px-12 max-w-7xl mx-auto flex flex-col items-center">
         
         {/* Hero Section (Centered) */}
         <div className="text-center max-w-4xl mx-auto mb-32">
@@ -97,7 +96,7 @@ export default function Home() {
               <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
               <span className="relative inline-flex rounded-full h-2 w-2 bg-green-500"></span>
             </span>
-            <span>Your life operating system</span>
+            <span>Online 24/7</span>
           </motion.div>
 
           <motion.h1 
@@ -115,7 +114,7 @@ export default function Home() {
             transition={{ delay: 0.2 }}
             className="text-lg md:text-xl text-[var(--muted)] max-w-2xl mx-auto mb-12 leading-relaxed"
           >
-            Your life operating system, where you can hold everything you want to share with your own private & secure personal assistant.
+            Helping with college. Managing work apps. Talking to other agents.
             <br className="hidden md:block" />
             <span className="text-[var(--foreground)] mt-2 block">No apps to open. Just chat.</span>
           </motion.p>
@@ -128,15 +127,11 @@ export default function Home() {
           >
             <Link 
               href="/onboarding"
-              className="group relative inline-flex items-center justify-center gap-2 px-8 py-4 bg-[var(--foreground)] text-[var(--background)] rounded-full font-semibold text-lg hover:opacity-90 transition-all active:scale-95"
+              className="group relative inline-flex items-center justify-center gap-2 px-8 py-4 bg-[var(--foreground)] text-[var(--background)] rounded-full font-semibold text-lg hover:opacity-90 transition-all active:scale-95 shadow-xl shadow-[var(--foreground)]/20"
             >
-              Start Your Life OS
+              Create my assistant
               <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
             </Link>
-            
-            <button className="px-8 py-4 bg-[var(--glass-bg)] text-[var(--foreground)] border border-[var(--glass-border)] rounded-full font-semibold text-lg hover:bg-[var(--glass-border)] transition-all">
-              See How It Works
-            </button>
           </motion.div>
         </div>
 
@@ -154,16 +149,16 @@ export default function Home() {
               </p>
               <ul className="space-y-4">
                 <li className="flex items-center gap-3">
-                  <div className="w-6 h-6 rounded-full bg-green-500/20 flex items-center justify-center text-green-500"><Check className="w-3 h-3" /></div>
-                  <span>Natural language commands</span>
+                  <div className="w-10 h-10 rounded-full bg-[var(--glass-bg)] border border-[var(--glass-border)] flex items-center justify-center"><img src="/assets/whatsapp.svg" alt="WhatsApp" className="w-5 h-5" /></div>
+                  <span>WhatsApp</span>
                 </li>
                 <li className="flex items-center gap-3">
-                  <div className="w-6 h-6 rounded-full bg-blue-500/20 flex items-center justify-center text-blue-500"><Check className="w-3 h-3" /></div>
-                  <span>Proactive notifications</span>
+                  <div className="w-10 h-10 rounded-full bg-[var(--glass-bg)] border border-[var(--glass-border)] flex items-center justify-center"><img src="/assets/imessage.svg" alt="iMessage" className="w-5 h-5" /></div>
+                  <span>iMessage</span>
                 </li>
                 <li className="flex items-center gap-3">
-                  <div className="w-6 h-6 rounded-full bg-purple-500/20 flex items-center justify-center text-purple-500"><Check className="w-3 h-3" /></div>
-                  <span>Context-aware suggestions</span>
+                  <div className="w-10 h-10 rounded-full bg-[var(--glass-bg)] border border-[var(--glass-border)] flex items-center justify-center"><img src="/assets/telegram.svg" alt="Telegram" className="w-5 h-5" /></div>
+                  <span>Telegram</span>
                 </li>
               </ul>
             </div>
@@ -281,7 +276,7 @@ export default function Home() {
 
         {/* Bento Grid: "Works While You Sleep" */}
         <section className="w-full mt-32 mb-20 text-left">
-          <div className="max-w-5xl mx-auto">
+          <div className="max-w-6xl mx-auto">
             <h2 className="text-3xl md:text-5xl font-bold mb-6 text-[var(--foreground)]">
               Background Intelligence.
             </h2>
@@ -297,7 +292,7 @@ export default function Home() {
                 className="md:col-span-2 p-8 rounded-3xl bg-[var(--card)] border border-[var(--border)] overflow-hidden relative group"
               >
                 <div className="absolute top-8 right-8 p-3 bg-[var(--glass-bg)] rounded-2xl">
-                  <Activity className="w-6 h-6 text-green-500" />
+                  <img src="/assets/oura.svg" alt="Oura" className="w-6 h-6" />
                 </div>
                 <h3 className="text-2xl font-semibold mb-2 text-[var(--foreground)]">Proactive Health</h3>
                 <p className="text-[var(--muted)] mb-8 max-w-md">Connects to Oura/Whoop. Detects recovery needs and automatically blocks focus time.</p>
@@ -325,7 +320,7 @@ export default function Home() {
                 className="p-8 rounded-3xl bg-[var(--card)] border border-[var(--border)] relative overflow-hidden"
               >
                 <div className="absolute top-8 right-8 p-3 bg-[var(--glass-bg)] rounded-2xl">
-                  <MapPin className="w-6 h-6 text-blue-500" />
+                  <img src="/assets/uber.svg" alt="Uber" className="w-6 h-6" />
                 </div>
                 <h3 className="text-xl font-semibold mb-2 text-[var(--foreground)]">Smart Travel</h3>
                 <p className="text-sm text-[var(--muted)] mb-6">Flight delayed? It rebooks your Uber.</p>
@@ -348,14 +343,15 @@ export default function Home() {
                 className="p-8 rounded-3xl bg-[var(--card)] border border-[var(--border)] relative overflow-hidden"
               >
                 <div className="absolute top-8 right-8 p-3 bg-[var(--glass-bg)] rounded-2xl">
-                  <MessageCircle className="w-6 h-6 text-purple-500" />
+                   <img src="/assets/gmail.svg" alt="Gmail" className="w-6 h-6" />
                 </div>
                 <h3 className="text-xl font-semibold mb-2 text-[var(--foreground)]">Omnipresent</h3>
                 <p className="text-sm text-[var(--muted)]">WhatsApp, Telegram, iMessage. It lives where you chat.</p>
                 
                 <div className="flex gap-2 mt-8 opacity-60 grayscale group-hover:grayscale-0 transition-all">
-                   <div className="w-10 h-10 rounded-xl bg-green-500/20 flex items-center justify-center"><Phone className="w-5 h-5 text-green-600" /></div>
-                   <div className="w-10 h-10 rounded-xl bg-blue-500/20 flex items-center justify-center"><MessageCircle className="w-5 h-5 text-blue-600" /></div>
+                   <div className="w-10 h-10 rounded-xl bg-[var(--glass-bg)] flex items-center justify-center"><img src="/assets/whatsapp.svg" className="w-5 h-5" /></div>
+                   <div className="w-10 h-10 rounded-xl bg-[var(--glass-bg)] flex items-center justify-center"><img src="/assets/telegram.svg" className="w-5 h-5" /></div>
+                   <div className="w-10 h-10 rounded-xl bg-[var(--glass-bg)] flex items-center justify-center"><img src="/assets/imessage.svg" className="w-5 h-5" /></div>
                 </div>
               </motion.div>
 

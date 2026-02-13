@@ -1,9 +1,10 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Check, ChevronRight, Brain, MessageCircle, Zap, Info, Key } from 'lucide-react';
+import { Check, ChevronRight, Brain, Zap, Info, Key, Loader2 } from 'lucide-react';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 
 // Types
 type Step = 'intelligence' | 'interface' | 'ignition';
@@ -17,25 +18,34 @@ export default function Onboarding() {
   const [showKeyInfo, setShowKeyInfo] = useState(false);
   const [selectedInterface, setSelectedInterface] = useState<Interface>('whatsapp');
   const [isProvisioning, setIsProvisioning] = useState(false);
+  const router = useRouter();
 
   // Transitions
   const nextStep = (next: Step) => setStep(next);
 
+  // Auto-redirect on Ignition
+  useEffect(() => {
+    if (step === 'ignition') {
+      const timer = setTimeout(() => {
+        router.push('/dashboard');
+      }, 2500); // 2.5s delay to show the "Success" animation
+      return () => clearTimeout(timer);
+    }
+  }, [step, router]);
+
   return (
-    <div className="min-h-screen bg-[var(--background)] text-[var(--foreground)] flex flex-col items-center justify-center p-6 overflow-hidden transition-colors duration-300 relative">
+    <div className="min-h-screen bg-[var(--background)] text-[var(--foreground)] flex flex-col items-center justify-center p-6 overflow-hidden transition-colors duration-300 relative font-sans">
       
       {/* Happy Background for Success Step */}
       {step === 'ignition' && (
-        <div 
-          className="absolute inset-0 z-0 opacity-40 transition-opacity duration-1000"
-          style={{
-            backgroundImage: 'url("https://images.unsplash.com/photo-1499346030926-9a72daac6ea6?q=80&w=3200&auto=format&fit=crop")',
-            backgroundSize: 'cover',
-            backgroundPosition: 'center',
-          }}
+        <motion.div 
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 0.4 }}
+          className="absolute inset-0 z-0 bg-gradient-to-tr from-green-500/20 via-blue-500/20 to-purple-500/20"
         />
       )}
 
+      {/* Progress */}
       <div className="fixed top-0 w-full p-8 flex flex-col items-center gap-2 z-10">
         <div className="flex gap-2">
           {['intelligence', 'interface', 'ignition'].map((s, i) => {
@@ -55,7 +65,7 @@ export default function Onboarding() {
             );
           })}
         </div>
-        <p className="text-xs text-[var(--muted)] font-medium">3 quick steps (less than 1 min)</p>
+        <p className="text-xs text-[var(--muted)] font-medium">Step {steps.indexOf(step) + 1} of 3</p>
       </div>
 
       <AnimatePresence mode="wait">
@@ -89,8 +99,8 @@ export default function Onboarding() {
                   </div>
                   {intelligence === 'standard' && <Check className="w-5 h-5 text-[var(--foreground)]" />}
                 </div>
-                <h3 className="text-xl font-semibold mb-1 text-[var(--foreground)]">Default Model</h3>
-                <p className="text-sm text-[var(--muted)]">Fast, reliable, and included in your plan.</p>
+                <h3 className="text-xl font-semibold mb-1 text-[var(--foreground)]">Default</h3>
+                <p className="text-sm text-[var(--muted)]">Fast, reliable, and included. Great for everyday tasks.</p>
               </button>
 
               <button 
@@ -108,7 +118,7 @@ export default function Onboarding() {
                   {intelligence === 'custom' && <Check className="w-5 h-5 text-[var(--foreground)]" />}
                 </div>
                 <h3 className="text-xl font-semibold mb-1 text-[var(--foreground)]">Custom Model</h3>
-                <p className="text-sm text-[var(--muted)]">Bring your own intelligence (OpenAI, Anthropic).</p>
+                <p className="text-sm text-[var(--muted)]">Bring your own key (OpenAI, Anthropic).</p>
               </button>
             </div>
 
@@ -121,7 +131,7 @@ export default function Onboarding() {
                   exit={{ opacity: 0, height: 0 }}
                   className="overflow-hidden"
                 >
-                  <div className="bg-[var(--card)] border border-[var(--border)] rounded-xl p-4 text-left space-y-2">
+                  <div className="bg-[var(--card)] border border-[var(--border)] rounded-xl p-4 text-left space-y-2 mt-2">
                     <div className="flex items-center gap-2 mb-2">
                       <label className="text-sm font-medium">API Key</label>
                       <button 
@@ -134,7 +144,7 @@ export default function Onboarding() {
                     
                     {showKeyInfo && (
                       <div className="text-xs bg-blue-500/10 text-blue-500 p-3 rounded-lg mb-3">
-                        <strong>What is this?</strong> An API Key is like a secret password that allows me to talk to a specific AI brain (like ChatGPT) using your personal account.
+                        <strong>What is this?</strong> An API Key allows me to talk to AI providers using your personal account. We store this securely.
                       </div>
                     )}
 
@@ -149,7 +159,7 @@ export default function Onboarding() {
                       onClick={() => setCustomKey('SKIPPED')}
                       className="text-xs text-[var(--muted)] hover:text-[var(--foreground)] underline"
                     >
-                      I'll add this later
+                      I'll add this later in settings
                     </button>
                   </div>
                 </motion.div>
@@ -177,7 +187,7 @@ export default function Onboarding() {
           >
             <div className="space-y-2">
               <h2 className="text-4xl font-bold tracking-tight text-[var(--foreground)]">Where do we talk?</h2>
-              <p className="text-[var(--muted)] text-lg">You can give me my name later. First, pick a home.</p>
+              <p className="text-[var(--muted)] text-lg">Pick your preferred app. You can change this anytime.</p>
             </div>
 
             <div className="space-y-3">
@@ -197,8 +207,8 @@ export default function Onboarding() {
                 >
                   <div className="flex items-center gap-4">
                     {/* App Icon Style */}
-                    <div className={`w-12 h-12 rounded-xl ${item.color} flex items-center justify-center shadow-md`}>
-                      <MessageCircle className="w-6 h-6 text-white fill-white" />
+                    <div className={`w-12 h-12 rounded-xl bg-[var(--glass-bg)] border border-[var(--glass-border)] flex items-center justify-center shadow-md`}>
+                      <img src={`/assets/${item.id}.svg`} alt={item.name} className="w-6 h-6" />
                     </div>
                     <div className="text-left">
                       <div className="font-semibold text-lg capitalize text-[var(--foreground)]">{item.name}</div>
@@ -212,17 +222,31 @@ export default function Onboarding() {
             <button 
               onClick={() => {
                 setIsProvisioning(true);
-                setTimeout(() => nextStep('ignition'), 3000);
+                // Simulate network request
+                setTimeout(() => {
+                    setIsProvisioning(false);
+                    nextStep('ignition');
+                }, 2000);
               }}
-              className="mt-8 px-8 py-4 bg-[var(--foreground)] text-[var(--background)] rounded-full font-semibold text-lg hover:opacity-90 active:scale-95 transition-all inline-flex items-center gap-2"
+              disabled={isProvisioning}
+              className="mt-8 px-8 py-4 bg-[var(--foreground)] text-[var(--background)] rounded-full font-semibold text-lg hover:opacity-90 active:scale-95 transition-all inline-flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              {isProvisioning ? 'Initializing...' : 'Create Life OS'}
-              {!isProvisioning && <ChevronRight className="w-5 h-5" />}
+              {isProvisioning ? (
+                <>
+                  <Loader2 className="w-5 h-5 animate-spin" />
+                  Creating Life OS...
+                </>
+              ) : (
+                <>
+                  Create my assistant
+                  <ChevronRight className="w-5 h-5" />
+                </>
+              )}
             </button>
           </motion.div>
         )}
 
-        {/* Step 3: Ignition */}
+        {/* Step 3: Ignition (Auto Redirect) */}
         {step === 'ignition' && (
           <motion.div 
             key="ignition"
@@ -231,24 +255,30 @@ export default function Onboarding() {
             className="max-w-md w-full text-center space-y-8 z-10"
           >
             <div className="relative mx-auto w-32 h-32 flex items-center justify-center">
-              <div className="absolute inset-0 bg-white/30 blur-3xl rounded-full animate-pulse" />
-              <div className="w-24 h-24 bg-white rounded-full flex items-center justify-center shadow-2xl">
-                <Check className="w-12 h-12 text-black" />
+              <motion.div 
+                animate={{ scale: [1, 1.2, 1] }}
+                transition={{ duration: 2, repeat: Infinity }}
+                className="absolute inset-0 bg-green-500/20 blur-3xl rounded-full" 
+              />
+              <div className="w-24 h-24 bg-gradient-to-tr from-green-400 to-green-600 rounded-full flex items-center justify-center shadow-2xl">
+                <Check className="w-12 h-12 text-white" />
               </div>
             </div>
 
             <div className="space-y-2">
-              <h2 className="text-4xl font-bold tracking-tight text-white drop-shadow-md">System Online</h2>
-              <p className="text-white/80 text-lg drop-shadow-sm">Your assistant is ready to help.</p>
+              <h2 className="text-4xl font-bold tracking-tight text-[var(--foreground)]">You're all set.</h2>
+              <p className="text-[var(--muted)] text-lg">Redirecting to your dashboard...</p>
+            </div>
+            
+            <div className="w-full bg-[var(--glass-border)] h-1 rounded-full overflow-hidden max-w-xs mx-auto">
+                <motion.div 
+                    initial={{ width: 0 }}
+                    animate={{ width: "100%" }}
+                    transition={{ duration: 2.5, ease: "linear" }}
+                    className="h-full bg-[var(--foreground)]"
+                />
             </div>
 
-            <Link 
-              href="/dashboard" 
-              className="w-full py-4 bg-white text-black rounded-2xl text-lg font-bold hover:bg-white/90 shadow-xl flex items-center justify-center gap-2 transition-transform hover:scale-105 active:scale-95"
-            >
-              Open My Mission Control
-              <ChevronRight className="w-5 h-5" />
-            </Link>
           </motion.div>
         )}
 
@@ -256,3 +286,5 @@ export default function Onboarding() {
     </div>
   );
 }
+
+const steps = ['intelligence', 'interface', 'ignition'];
