@@ -126,7 +126,7 @@ export default function Home() {
             className="flex flex-col sm:flex-row gap-4 justify-center"
           >
             <Link 
-              href="/onboarding"
+              href="/signup"
               className="group relative inline-flex items-center justify-center gap-2 px-8 py-4 bg-[var(--foreground)] text-[var(--background)] rounded-full font-semibold text-lg hover:opacity-90 transition-all active:scale-95 shadow-xl shadow-[var(--foreground)]/20"
             >
               Create my assistant

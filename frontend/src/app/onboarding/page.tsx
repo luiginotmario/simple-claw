@@ -5,6 +5,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { Check, ChevronRight, Brain, Zap, Info, Key, Loader2, MessageCircle, Send, Smartphone, X, Copy, QrCode, Sparkles } from 'lucide-react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
+import { supabase } from '@/lib/supabase';
 
 // Types
 type Step = 'setup' | 'ignition';
@@ -91,12 +92,44 @@ export default function Onboarding() {
     // User stays on setup page to confirm or change other settings if needed
   };
 
-  const handleFinalize = () => {
+  const handleFinalize = async () => {
       setIsProvisioning(true);
-      setTimeout(() => {
-          setIsProvisioning(false);
+      
+      try {
+        // Get current user session
+        const { data: { session } } = await supabase.auth.getSession();
+        
+        if (!session) {
+          alert('Please sign in first');
+          router.push('/login');
+          return;
+        }
+        
+        // Call backend to provision agent
+        const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/provision`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${session.access_token}`,
+          },
+          body: JSON.stringify({
+            plan: 'free', // Start with free tier
+          }),
+        });
+        
+        const data = await response.json();
+        
+        if (data.success) {
           nextStep('ignition');
-      }, 2000);
+        } else {
+          alert(`Provisioning failed: ${data.error}`);
+        }
+      } catch (error) {
+        console.error('Provisioning error:', error);
+        alert('Failed to provision agent. Please try again.');
+      } finally {
+        setIsProvisioning(false);
+      }
   }
 
   // Auto-redirect on Ignition

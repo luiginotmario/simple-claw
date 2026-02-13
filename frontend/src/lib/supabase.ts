@@ -1,31 +1,46 @@
-// Mock Supabase Client
+import { createClient as createSupabaseClient } from '@supabase/supabase-js';
 
-export interface User {
-  id: string;
-  email: string;
+const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
+const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!;
+
+export const supabase = createSupabaseClient(supabaseUrl, supabaseAnonKey);
+
+// Helper to get current user
+export async function getCurrentUser() {
+  const { data: { user }, error } = await supabase.auth.getUser();
+  return { user, error };
 }
 
-export const createClient = () => {
-  return {
-    auth: {
-      signUp: async ({ email, password }: { email: string, password?: string }) => {
-        // Mock success
-        console.log(`Mock SignUp: ${email}`);
-        return {
-          data: {
-            user: { id: 'mock-user-123', email },
-            session: { access_token: 'mock-token' }
-          },
-          error: null
-        };
-      },
+// Helper to sign out
+export async function signOut() {
+  return await supabase.auth.signOut();
+}
+
+// Helper to sign in with Google
+export async function signInWithGoogle() {
+  return await supabase.auth.signInWithOAuth({
+    provider: 'google',
+    options: {
+      redirectTo: `${window.location.origin}/onboarding`,
     },
-    from: (table: string) => ({
-      insert: async (data: any) => {
-        console.log(`Mock Insert into ${table}:`, data);
-        return { data: [data], error: null };
-      },
-      select: async () => ({ data: [], error: null })
-    })
-  };
-};
+  });
+}
+
+// Helper to sign in with email/password
+export async function signInWithEmail(email: string, password: string) {
+  return await supabase.auth.signInWithPassword({
+    email,
+    password,
+  });
+}
+
+// Helper to sign up with email/password
+export async function signUpWithEmail(email: string, password: string) {
+  return await supabase.auth.signUp({
+    email,
+    password,
+    options: {
+      emailRedirectTo: `${window.location.origin}/onboarding`,
+    },
+  });
+}

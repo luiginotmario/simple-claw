@@ -45,8 +45,9 @@ app.onError((err, c) => {
 const port = parseInt(config.PORT);
 
 async function startServer() {
-  // Run migrations on startup
-  await runMigrations();
+  // NOTE: Migrations disabled - Supabase free tier doesn't support IPv4 direct connections
+  // Tables are created manually via SQL Editor
+  // await runMigrations();
   
   logger.info('Starting Life OS Backend', {
     port,

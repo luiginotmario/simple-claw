@@ -29,6 +29,17 @@ import {
   Phone
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { supabase, signOut } from '@/lib/supabase';
+import { useRouter } from 'next/navigation';
+
+interface UserProfile {
+  id: string;
+  email: string;
+  full_name?: string;
+  subscription_status: string;
+  instance_status: string;
+  agent_url?: string;
+}
 
 export default function Dashboard() {
   const [greeting, setGreeting] = useState('Good afternoon');
@@ -36,6 +47,9 @@ export default function Dashboard() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [showProfileModal, setShowProfileModal] = useState(false);
   const [isDark, setIsDark] = useState(true);
+  const [user, setUser] = useState<UserProfile | null>(null);
+  const [loading, setLoading] = useState(true);
+  const router = useRouter();
 
   useEffect(() => {
     const hour = new Date().getHours();
@@ -48,7 +62,57 @@ export default function Dashboard() {
       const isSystemDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
       setIsDark(isSystemDark);
     }
+    
+    // Fetch user data
+    fetchUserData();
   }, []);
+  
+  async function fetchUserData() {
+    try {
+      const { data: { user: authUser }, error: authError } = await supabase.auth.getUser();
+      
+      if (authError || !authUser) {
+        router.push('/login');
+        return;
+      }
+      
+      const { data: profile, error: profileError } = await supabase
+        .from('users')
+        .select('*')
+        .eq('id', authUser.id)
+        .single();
+      
+      if (profile) {
+        setUser(profile);
+      }
+    } catch (error) {
+      console.error('Failed to fetch user:', error);
+    } finally {
+      setLoading(false);
+    }
+  }
+  
+  const handleSignOut = async () => {
+    await signOut();
+    router.push('/');
+  };
+  
+  const getUserInitials = () => {
+    if (!user?.full_name) return user?.email?.[0]?.toUpperCase() || 'U';
+    return user.full_name.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2);
+  };
+  
+  const getUserDisplayName = () => {
+    return user?.full_name || user?.email?.split('@')[0] || 'User';
+  };
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-[var(--background)] flex items-center justify-center">
+        <div className="text-[var(--muted)]">Loading...</div>
+      </div>
+    );
+  }
 
   const toggleTheme = () => {
     setIsDark(!isDark);
@@ -140,10 +204,14 @@ export default function Dashboard() {
             className="w-full p-4 rounded-xl bg-[var(--glass-bg)] border border-[var(--glass-border)] text-left hover:bg-[var(--glass-border)] transition-colors"
           >
             <div className="flex items-center gap-3 mb-2">
-              <div className="w-8 h-8 rounded-full bg-gradient-to-tr from-blue-400 to-purple-500 flex items-center justify-center text-white text-xs font-bold shadow-sm">LR</div>
+              <div className="w-8 h-8 rounded-full bg-gradient-to-tr from-blue-400 to-purple-500 flex items-center justify-center text-white text-xs font-bold shadow-sm">
+                {getUserInitials()}
+              </div>
               <div>
-                <div className="text-sm font-medium">Luigi Rivo</div>
-                <div className="text-xs text-[var(--muted)]">Pro Plan</div>
+                <div className="text-sm font-medium">{getUserDisplayName()}</div>
+                <div className="text-xs text-[var(--muted)]">
+                  {user?.subscription_status === 'active' ? 'Pro Plan' : 'Free Plan'}
+                </div>
               </div>
             </div>
             <div className="h-1 w-full bg-[var(--glass-border)] rounded-full overflow-hidden">
@@ -172,8 +240,14 @@ export default function Dashboard() {
         {/* Header (Desktop) */}
         <header className="hidden md:flex justify-between items-center mb-8">
           <div>
-            <h1 className="text-2xl font-semibold tracking-tight">{greeting}, Luigi.</h1>
-            <p className="text-[var(--muted)]">System is active and listening on WhatsApp.</p>
+            <h1 className="text-2xl font-semibold tracking-tight">{greeting}, {getUserDisplayName()}.</h1>
+            <p className="text-[var(--muted)]">
+              {user?.instance_status === 'active' 
+                ? 'System is active and ready.' 
+                : user?.instance_status === 'provisioning'
+                ? 'Your agent is being set up...'
+                : 'Connect a messaging platform to get started.'}
+            </p>
           </div>
           <div className="flex gap-3">
             <button onClick={toggleTheme} className="p-2 rounded-full hover:bg-[var(--glass-bg)] transition-colors text-[var(--muted)]">
@@ -409,7 +483,12 @@ export default function Dashboard() {
                 </div>
                 
                 <div className="text-center">
-                    <button className="text-red-500 text-sm font-medium hover:underline">Sign Out</button>
+                    <button 
+                      onClick={handleSignOut}
+                      className="text-red-500 text-sm font-medium hover:underline"
+                    >
+                      Sign Out
+                    </button>
                     <p className="text-xs text-[var(--muted)] mt-2">Life OS v1.0.2</p>
                 </div>
 
@@ -464,12 +543,12 @@ export default function Dashboard() {
 
               <div className="flex flex-col items-center mb-6">
                 <div className="w-24 h-24 rounded-full bg-gradient-to-tr from-blue-400 to-purple-500 flex items-center justify-center text-white text-3xl font-bold shadow-lg mb-4">
-                  LR
+                  {getUserInitials()}
                 </div>
-                <h2 className="text-2xl font-bold">Luigi Rivo</h2>
-                <p className="text-[var(--muted)]">luigi@example.com</p>
-                <div className="mt-2 px-3 py-1 bg-green-500/10 text-green-500 text-xs font-bold rounded-full border border-green-500/20">
-                  PRO MEMBER
+                <h2 className="text-2xl font-bold">{getUserDisplayName()}</h2>
+                <p className="text-[var(--muted)]">{user?.email}</p>
+                <div className={`mt-2 px-3 py-1 ${user?.subscription_status === 'active' ? 'bg-green-500/10 text-green-500' : 'bg-gray-500/10 text-gray-500'} text-xs font-bold rounded-full border ${user?.subscription_status === 'active' ? 'border-green-500/20' : 'border-gray-500/20'}`}>
+                  {user?.subscription_status === 'active' ? 'PRO MEMBER' : 'FREE TIER'}
                 </div>
               </div>
 
