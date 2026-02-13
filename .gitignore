@@ -6,6 +6,10 @@ backend/dist
 backend/.env
 backend/drizzle/*.sql
 
+# frontend
+frontend/node_modules
+frontend/.next
+
 # dependencies
 /node_modules
 /.pnp

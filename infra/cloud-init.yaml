@@ -43,24 +43,40 @@ runcmd:
     # Create OpenClaw directories and config
     - mkdir -p /home/openclaw/.openclaw
 
-    # Generate a random token for gateway auth
-    # SECURITY PATCH: "allowInsecureAuth": false forces token auth even for local requests (proxied)
+    # Generate gateway token and full OpenClaw config
+    # Life OS provides ALL credentials - user does nothing
     - |
         TOKEN=$(openssl rand -hex 32)
-        cat > /home/openclaw/.openclaw/openclaw.json << OCCONFIG
+        cat > /home/openclaw/.openclaw/openclaw.json << 'OCCONFIG'
         {
           "gateway": {
             "mode": "local",
             "auth": {
-              "token": "$TOKEN"
+              "token": "GATEWAY_TOKEN_PLACEHOLDER"
             },
             "controlUi": {
               "allowInsecureAuth": false
             },
             "trustedProxies": ["127.0.0.1", "::1"]
+          },
+          "llm": {
+            "provider": "openai",
+            "apiKey": "OPENAI_KEY_PLACEHOLDER",
+            "model": "gpt-4o-mini"
+          },
+          "agent": {
+            "systemPrompt": "You are a helpful personal assistant. Start by asking the user their name and what they'd like you to help with. Be warm and conversational."
+          },
+          "skills": {
+            "web_search": {
+              "enabled": true
+            }
           }
         }
         OCCONFIG
+        
+        # Replace placeholders (will be injected by provisioning script)
+        sed -i "s/GATEWAY_TOKEN_PLACEHOLDER/$TOKEN/g" /home/openclaw/.openclaw/openclaw.json
 
     - chown -R openclaw:openclaw /home/openclaw
 

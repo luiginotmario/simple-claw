@@ -53,25 +53,16 @@ async function startServer() {
     env: config.NODE_ENV,
   });
   
-  // For Node runtime (Render/Production)
-  if (typeof Bun === 'undefined') {
-    const { serve } = await import('@hono/node-server');
-    serve({
-      fetch: app.fetch,
-      port,
-    });
-    
-    console.log(`🚀 Life OS Backend running on http://localhost:${port}`);
-  }
+  const { serve } = await import('@hono/node-server');
+  serve({
+    fetch: app.fetch,
+    port,
+  });
+  
+  console.log(`🚀 Life OS Backend running on http://localhost:${port}`);
 }
 
 startServer().catch((error) => {
   logger.error('Failed to start server', error instanceof Error ? error : new Error(String(error)));
   process.exit(1);
 });
-
-// For Bun runtime
-export default {
-  port,
-  fetch: app.fetch,
-};

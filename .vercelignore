@@ -2,3 +2,4 @@ backend/
 infra/
 docs/
 *.md
+!frontend/

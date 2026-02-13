@@ -12,7 +12,6 @@
     "db:studio": "drizzle-kit studio"
   },
   "dependencies": {
-    "@hetzner/hetzner-cloud": "^1.0.0",
     "@supabase/supabase-js": "^2.95.3",
     "@hono/node-server": "^1.14.0",
     "hono": "^4.6.14",

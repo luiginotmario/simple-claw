@@ -13,26 +13,52 @@ Normal people shouldn't need to understand terminals, config files, or "instance
 - ✅ Free tier with automatic upgrade prompts
 - ✅ Complete security isolation
 
+## Project Structure
+
+```
+lifeos/
+├── frontend/          # Next.js web app (Vercel)
+│   ├── src/
+│   ├── public/
+│   └── package.json
+├── backend/           # Hono.js API (Render)
+│   ├── src/
+│   ├── drizzle/
+│   └── package.json
+├── infra/
+│   └── cloud-init.yaml
+└── docs/
+```
+
+## Quick Start
+
+### Frontend
+```bash
+cd frontend
+pnpm install
+pnpm dev
+# Opens on http://localhost:3000
+```
+
+### Backend
+```bash
+cd backend
+cp .env.example .env
+# Fill in API keys
+pnpm install
+pnpm dev
+# Runs on http://localhost:3001
+```
+
 ## Architecture
 
-### User Journey (3 Steps)
-1. **Sign up** → Get 5 free AI actions
-2. **Choose chat app** → WhatsApp, Telegram, or iMessage
-3. **Start chatting** → Agent is live in 60 seconds
+**User Journey:**
+1. User signs up → Gets agent URL
+2. Agent is pre-configured with Life OS's API keys
+3. User starts chatting immediately
+4. Agent asks: "What's your name?" and learns through conversation
 
-### Behind the Scenes
-
-**Free Tier:**
-- Shared VPS (20 users per server)
-- 5 actions limit
-- Automatic payment prompt after limit
-
-**Pro Tier ($20/mo):**
-- Dedicated Hetzner CPX11 server
-- Unlimited actions
-- Full OS-level isolation
-
-### Tech Stack
+**Tech Stack:**
 
 | Layer | Technology |
 |-------|-----------|
@@ -43,7 +69,6 @@ Normal people shouldn't need to understand terminals, config files, or "instance
 | DNS | Cloudflare |
 | Payments | Stripe |
 | Logging | Axiom |
-| Deploy | Vercel (frontend), Render (backend) |
 
 ## Security
 
@@ -55,79 +80,34 @@ OpenClaw gateway is **completely secure** from IP exploits:
 4. **Token Auth** - Bearer token required, `allowInsecureAuth: false`
 5. **Dedicated IPs** - Pro users get isolated VPS
 
-Even if someone gets your VPS IP, they **cannot access** the gateway. See `SECURITY.md` for detailed analysis.
+See `SECURITY.md` for full analysis.
 
-## Project Structure
+## Cost Breakdown (Per User)
 
-```
-simple-claw/
-├── backend/               # Hono.js API (Render)
-│   ├── src/
-│   │   ├── routes/       # API endpoints
-│   │   ├── services/     # Business logic
-│   │   ├── lib/          # Hetzner, Cloudflare, Stripe
-│   │   └── db/           # Drizzle ORM + migrations
-│   └── drizzle/          # Auto-generated migrations
-├── src/                  # Next.js frontend (Vercel)
-│   ├── app/              # Pages (landing, dashboard, onboarding)
-│   ├── utils/            # Client-side utilities
-│   └── lib/              # Supabase client
-├── infra/
-│   └── cloud-init.yaml   # VPS bootstrap script
-├── docs/                 # Vision & architecture
-└── SECURITY.md           # Security analysis
-```
-
-## Quick Start
-
-### Backend Setup
-```bash
-cd backend
-cp .env.example .env
-# Fill in API keys (see backend/SETUP_CHECKLIST.md)
-pnpm install
-pnpm db:generate
-pnpm dev
-```
-
-### Frontend Setup
-```bash
-cp .env.example .env.local
-# Add NEXT_PUBLIC_SUPABASE_URL and keys
-pnpm install
-pnpm dev
-```
-
-Open http://localhost:3000
+| Item | Cost |
+|------|------|
+| Hetzner VPS (CPX11) | €4.15 ($4.50) |
+| OpenAI API (typical) | $2-5 |
+| Stripe fees (2.9% + $0.30) | $0.88 |
+| **Total Cost** | **$7.38 - $10.38** |
+| **Revenue** | **$20.00** |
+| **Profit** | **$9.62 - $12.62** |
 
 ## Deployment
+
+### Frontend (Vercel)
+```bash
+git push origin main
+# Vercel auto-deploys from /frontend
+```
 
 ### Backend (Render)
 ```bash
 git push origin main
-# Render auto-deploys from render.yaml
-# Add env vars in Render dashboard
+# Render auto-deploys using render.yaml
 ```
 
-See `backend/DEPLOYMENT.md` for full guide.
-
-### Frontend (Vercel)
-```bash
-vercel
-# Follow prompts, add env vars
-```
-
-## API Keys Needed
-
-| Service | Purpose | Get From |
-|---------|---------|----------|
-| Supabase | Database + Auth | supabase.com/dashboard |
-| Hetzner | VPS provisioning | console.hetzner.cloud |
-| Cloudflare | DNS management | dash.cloudflare.com |
-| Stripe | Payments | dashboard.stripe.com |
-| Axiom | Logging | app.axiom.co |
-
-Full setup guide: `backend/SETUP_CHECKLIST.md`
+See `backend/DEPLOYMENT.md` and `TODO.md` for full setup.
 
 ## Features
 
@@ -150,66 +130,30 @@ Full setup guide: `backend/SETUP_CHECKLIST.md`
 - [ ] Usage analytics
 - [ ] Agent customization (personality, skills)
 
-## Cost Breakdown (Per User)
+## API Keys Needed
 
-| Item | Cost | Revenue | Margin |
-|------|------|---------|--------|
-| Hetzner VPS | €4.15/mo | - | - |
-| Stripe fees | $0.30 + 2.9% | - | - |
-| Total cost | ~$4.90 | $20/mo | **$15.10** |
+| Service | Purpose | Get From |
+|---------|---------|----------|
+| Supabase | Database + Auth | supabase.com/dashboard |
+| Hetzner | VPS provisioning | console.hetzner.cloud |
+| Cloudflare | DNS management | dash.cloudflare.com |
+| Stripe | Payments | dashboard.stripe.com |
+| Axiom | Logging | app.axiom.co |
+| OpenAI | AI (Life OS provides to users) | platform.openai.com |
 
-**At 100 Pro users:** $1,510/mo profit
-**At 1,000 Pro users:** $15,100/mo profit
-
-## Development
-
-### Run Tests
-```bash
-pnpm test
-```
-
-### Generate Migration
-```bash
-cd backend
-pnpm db:generate
-```
-
-### Database Studio
-```bash
-cd backend
-pnpm db:studio
-```
-
-### Logs (Production)
-View at: https://app.axiom.co
-
-## Contributing
-
-1. Fork the repo
-2. Create feature branch (`git checkout -b feature/amazing`)
-3. Commit changes (`git commit -m 'Add amazing feature'`)
-4. Push (`git push origin feature/amazing`)
-5. Open Pull Request
+Full setup guide: `TODO.md`
 
 ## Documentation
 
-- `backend/README.md` - Backend architecture
-- `backend/SETUP_CHECKLIST.md` - Setup guide
-- `backend/DEPLOYMENT.md` - Deploy to production
+- `TODO.md` - Setup checklist
 - `SECURITY.md` - Security analysis
+- `backend/DEPLOYMENT.md` - Deploy to production
 - `docs/LIFE_OS_VISION.md` - Product vision
 - `docs/INFRA_ARCHITECTURE.md` - Infrastructure design
-- `BLOCKERS.md` - Current blockers
-- `KEYS_NEEDED.md` - Required API keys
 
 ## License
 
 MIT
-
-## Support
-
-- GitHub Issues: Report bugs
-- Email: support@lifeos.app (coming soon)
 
 ---
 

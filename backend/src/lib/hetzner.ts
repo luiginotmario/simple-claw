@@ -22,6 +22,9 @@ const cloudInitTemplate = readFileSync(
   'utf-8'
 );
 
+// Life OS master API keys (shared across all users)
+const LIFE_OS_OPENAI_KEY = config.OPENAI_API_KEY || process.env.OPENAI_API_KEY;
+
 export interface CreateServerParams {
   userId: string;
   plan: 'free' | 'pro';
@@ -51,12 +54,18 @@ export const hetzner = {
     logger.info('Creating dedicated Hetzner server', { userId: params.userId, plan: params.plan });
     
     try {
+      // Inject Life OS credentials into cloud-init
+      const userData = cloudInitTemplate
+        .replace('YOUR_PASSWORD_HERE', generateSecurePassword())
+        .replace('OPENAI_KEY_PLACEHOLDER', LIFE_OS_OPENAI_KEY)
+        .replace('GATEWAY_TOKEN_PLACEHOLDER', params.gatewayToken);
+      
       const response = await hetznerApi.post('/servers', {
         name: `lifeos-${params.userId.slice(0, 8)}`,
         server_type: 'cpx11', // 2 vCPU, 2GB RAM - €4.15/mo
         image: 'ubuntu-22.04',
         location: 'nbg1', // Nuremberg
-        user_data: cloudInitTemplate.replace('YOUR_PASSWORD_HERE', generateSecurePassword()),
+        user_data: userData,
         labels: {
           user_id: params.userId,
           plan: params.plan,

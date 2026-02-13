@@ -27,6 +27,9 @@ const envSchema = z.object({
   // Encryption
   ENCRYPTION_KEY: z.string().min(32),
   
+  // Life OS Master API Keys (shared across all users)
+  OPENAI_API_KEY: z.string(), // Life OS's OpenAI key
+  
   // Server
   PORT: z.string().default('3001'),
   NODE_ENV: z.enum(['development', 'production', 'test']).default('development'),
