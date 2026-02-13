@@ -24,7 +24,9 @@ import {
   Shield,
   Smartphone,
   ChevronRight,
-  Brain
+  Brain,
+  MessageCircle,
+  Phone
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 
@@ -72,6 +74,14 @@ export default function Dashboard() {
     { id: 'chat', icon: MessageSquare, label: 'Chat Logs' },
     { id: 'integrations', icon: Zap, label: 'Integrations' },
     { id: 'settings', icon: Settings, label: 'Settings' },
+  ];
+
+  const integrationsList = [
+      { id: 'clawdtalk', name: 'ClawdTalk', status: 'Connected', icon: MessageCircle, description: 'Voice & text interface for your assistant.', color: 'text-blue-500', bg: 'bg-blue-500/10' },
+      { id: 'oura', name: 'Oura', status: 'Syncing...', icon: Activity, description: 'Sleep and readiness tracking.', color: 'text-white', bg: 'bg-white/10' },
+      { id: 'gcal', name: 'Google Calendar', status: 'Up to date', icon: Calendar, description: 'Schedule management and event planning.', color: 'text-blue-400', bg: 'bg-blue-400/10' },
+      { id: 'gmail', name: 'Gmail', status: 'Scanning', icon: Mail, description: 'Email drafting and summarization.', color: 'text-red-500', bg: 'bg-red-500/10' },
+      { id: 'uber', name: 'Uber', status: 'Standby', icon: MapPin, description: 'Ride booking and price checking.', color: 'text-black', bg: 'bg-white' },
   ];
 
   return (
@@ -227,26 +237,22 @@ export default function Dashboard() {
                     </button>
                   </div>
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                    {[
-                      { name: 'Oura', status: 'Syncing...', icon: '/assets/oura.svg' },
-                      { name: 'Google Calendar', status: 'Up to date', icon: '/assets/calendar.svg' },
-                      { name: 'Gmail', status: 'Scanning', icon: '/assets/gmail.svg' },
-                      { name: 'Uber', status: 'Standby', icon: '/assets/uber.svg' },
-                    ].map((app, i) => (
+                    {integrationsList.slice(0, 4).map((app, i) => (
                       <div 
-                        key={app.name}
+                        key={app.id}
+                        onClick={() => setActiveTab('integrations')}
                         className="p-4 rounded-2xl border border-[var(--border)] bg-[var(--glass-bg)] flex items-center justify-between hover:border-[var(--foreground)] transition-colors cursor-pointer group"
                       >
                         <div className="flex items-center gap-3">
-                          <div className={`w-10 h-10 rounded-xl bg-[var(--background)] border border-[var(--border)] flex items-center justify-center p-2`}>
-                            <img src={app.icon} alt={app.name} className="w-full h-full object-contain" />
+                          <div className={`w-10 h-10 rounded-xl ${app.bg} border border-[var(--border)] flex items-center justify-center p-2`}>
+                            <app.icon className={`w-5 h-5 ${app.color}`} />
                           </div>
                           <div>
                             <div className="font-medium text-sm">{app.name}</div>
                             <div className="text-xs text-[var(--muted)]">{app.status}</div>
                           </div>
                         </div>
-                        <div className="w-2 h-2 rounded-full bg-green-500 animate-pulse" />
+                        <div className={`w-2 h-2 rounded-full ${app.status === 'Connected' || app.status === 'Up to date' ? 'bg-green-500 animate-pulse' : 'bg-yellow-500'}`} />
                       </div>
                     ))}
                   </div>
@@ -282,6 +288,57 @@ export default function Dashboard() {
                     ))}
                   </div>
                 </div>
+              </div>
+            </motion.div>
+          )}
+
+          {/* INTEGRATIONS TAB */}
+          {activeTab === 'integrations' && (
+             <motion.div 
+              key="integrations"
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -10 }}
+              className="max-w-4xl mx-auto"
+            >
+              <div className="mb-8">
+                <h2 className="text-2xl font-bold mb-2">Integrations</h2>
+                <p className="text-[var(--muted)]">Connect your favorite apps to supercharge your assistant.</p>
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                {integrationsList.map((app) => (
+                   <div 
+                      key={app.id}
+                      className="p-6 rounded-2xl border border-[var(--border)] bg-[var(--card)] flex items-start justify-between hover:border-[var(--foreground)] transition-all group"
+                    >
+                      <div className="flex gap-4">
+                         <div className={`w-14 h-14 rounded-xl ${app.bg} border border-[var(--border)] flex items-center justify-center`}>
+                            <app.icon className={`w-7 h-7 ${app.color}`} />
+                          </div>
+                          <div>
+                            <div className="font-semibold text-lg flex items-center gap-2">
+                                {app.name}
+                                {app.id === 'clawdtalk' && <span className="px-2 py-0.5 bg-blue-500/10 text-blue-500 text-[10px] rounded-full border border-blue-500/20 font-bold uppercase">New</span>}
+                            </div>
+                            <p className="text-sm text-[var(--muted)] mt-1">{app.description}</p>
+                            <div className="mt-3 flex items-center gap-2">
+                                <div className={`w-2 h-2 rounded-full ${app.status === 'Connected' || app.status === 'Up to date' ? 'bg-green-500' : 'bg-yellow-500'}`} />
+                                <span className="text-xs font-medium text-[var(--foreground)]">{app.status}</span>
+                            </div>
+                          </div>
+                      </div>
+                      <button className="px-4 py-2 rounded-lg bg-[var(--glass-bg)] text-sm font-medium hover:bg-[var(--foreground)] hover:text-[var(--background)] transition-colors">
+                        Configure
+                      </button>
+                    </div>
+                ))}
+
+                {/* Add New Integration Placeholder */}
+                 <button className="p-6 rounded-2xl border border-dashed border-[var(--border)] flex flex-col items-center justify-center text-[var(--muted)] hover:text-[var(--foreground)] hover:border-[var(--foreground)] hover:bg-[var(--glass-bg)] transition-all min-h-[160px]">
+                    <Plus className="w-8 h-8 mb-2" />
+                    <span className="font-medium">Add Integration</span>
+                 </button>
               </div>
             </motion.div>
           )}
@@ -361,7 +418,7 @@ export default function Dashboard() {
           )}
 
           {/* Fallback for other tabs */}
-          {(activeTab === 'chat' || activeTab === 'integrations') && (
+          {(activeTab === 'chat') && (
             <motion.div 
               key="fallback"
               initial={{ opacity: 0 }}
