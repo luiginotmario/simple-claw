@@ -23,7 +23,8 @@ import {
   Bell,
   Shield,
   Smartphone,
-  ChevronRight
+  ChevronRight,
+  Brain
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 
