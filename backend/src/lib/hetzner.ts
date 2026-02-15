@@ -58,7 +58,8 @@ export const hetzner = {
       const userData = cloudInitTemplate
         .replace('YOUR_PASSWORD_HERE', generateSecurePassword())
         .replace('OPENAI_KEY_PLACEHOLDER', LIFE_OS_OPENAI_KEY)
-        .replace('GATEWAY_TOKEN_PLACEHOLDER', params.gatewayToken);
+        .replace('GATEWAY_TOKEN_PLACEHOLDER', params.gatewayToken)
+        .replace('PRICESAPI_KEY_PLACEHOLDER', config.PRICESAPI_KEY || '');
       
       const response = await hetznerApi.post('/servers', {
         name: `lifeos-${params.userId.slice(0, 8)}`,
