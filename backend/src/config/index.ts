@@ -29,6 +29,9 @@ const envSchema = z.object({
   
   // Life OS Master API Keys (shared across all users)
   OPENAI_API_KEY: z.string(), // Life OS's OpenAI key
+
+  // PricesAPI (shopping & price tracking)
+  PRICESAPI_KEY: z.string().optional().default('pricesapi_oh02deGgi7W9JV2vASHdOVTS7SbLXV'),
   
   // Server
   PORT: z.string().default('3001'),

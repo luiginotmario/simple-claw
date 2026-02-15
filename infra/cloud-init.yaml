@@ -65,18 +65,89 @@ runcmd:
             "model": "gpt-4o-mini"
           },
           "agent": {
-            "systemPrompt": "You are a helpful personal assistant. Start by asking the user their name and what they'd like you to help with. Be warm and conversational."
+            "systemPrompt": "You are a helpful personal assistant with shopping superpowers. You can search for products, compare prices across 100+ retailers, track price changes over time, and provide direct purchase links. Start by asking the user their name and what they'd like you to help with. Be warm and conversational."
           },
           "skills": {
             "web_search": {
               "enabled": true
+            },
+            "price-tracker": {
+              "enabled": true,
+              "apiKey": "PRICESAPI_KEY_PLACEHOLDER"
             }
+          },
+          "tools": {
+            "allow": ["group:web", "group:memory", "cron"]
           }
         }
         OCCONFIG
         
         # Replace placeholders (will be injected by provisioning script)
         sed -i "s/GATEWAY_TOKEN_PLACEHOLDER/$TOKEN/g" /home/openclaw/.openclaw/openclaw.json
+
+    # Install price-tracker skill
+    - mkdir -p /home/openclaw/.openclaw/skills/price-tracker
+    - |
+        cat > /home/openclaw/.openclaw/skills/price-tracker/SKILL.md << 'SKILLMD'
+        ---
+        name: price-tracker
+        description: Search products, compare prices across retailers, track price changes over time, and provide purchase links using PricesAPI.
+        metadata: {"openclaw":{"requires":{"env":["PRICESAPI_KEY"]},"primaryEnv":"PRICESAPI_KEY"}}
+        ---
+
+        ## Price Tracker & Shopping Assistant
+
+        You can help users find the best deals, compare prices, and track price changes over time.
+
+        ### Searching for Products
+
+        When a user asks to find, search for, or buy a product, use `web_fetch` to search PricesAPI:
+
+            web_fetch({ url: "https://api.pricesapi.io/api/v1/products/search?q=USER_QUERY&limit=5&api_key=${PRICESAPI_KEY}" })
+
+        Replace USER_QUERY with the URL-encoded product name the user is looking for.
+
+        Parse the JSON response. The response has this structure:
+        - `success`: boolean
+        - `data.query`: the search term
+        - `data.results`: array of products, each with `id`, `title`, `image`, `offerCount`
+        - `data.total`: total number of results
+
+        ### Getting Price Offers
+
+        Once you have a product ID from search results, fetch current offers from retailers:
+
+            web_fetch({ url: "https://api.pricesapi.io/api/v1/products/PRODUCT_ID/offers?country=us&api_key=${PRICESAPI_KEY}" })
+
+        Replace PRODUCT_ID with the numeric product ID. Note: this endpoint performs real-time scraping and may take 5-30 seconds.
+
+        Each offer in `data.offers` includes:
+        - `seller`: retailer name
+        - `price`: numeric price
+        - `currency`: currency code
+        - `url`: direct purchase link to the retailer
+        - `rating`: seller rating
+        - `stock`: availability status
+        - `delivery`: shipping information
+
+        Present results ranked cheapest first with seller name, price, stock status, and direct purchase link.
+
+        ### Price History Tracking
+
+        When a user asks to track a product price or asks if now is a good time to buy:
+        1. Fetch current offers
+        2. Store a price snapshot in memory: product name, ID, date, lowest price, seller
+        3. Optionally set up a cron job to re-check daily
+
+        When asked about price trends:
+        1. Search memory for previous snapshots of that product
+        2. Compare current vs historical prices
+        3. Advise: price dropped/stable/increased with percentage and recommendation
+
+        ### Supported Countries
+
+        Use the `country` parameter: US, CA, BR, MX, UK, DE, FR, IT, ES, NL, SE, PL, AU, JP, IN, SG, AE, SA. Default: us.
+        SKILLMD
 
     - chown -R openclaw:openclaw /home/openclaw
 
@@ -95,6 +166,7 @@ runcmd:
         WorkingDirectory=/home/openclaw
         Environment=HOME=/home/openclaw
         Environment=NODE_ENV=production
+        Environment=PRICESAPI_KEY=PRICESAPI_KEY_PLACEHOLDER
         ExecStart=/usr/bin/openclaw gateway --port 18789 --bind loopback
         Restart=always
         RestartSec=10
