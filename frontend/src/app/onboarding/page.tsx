@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Check, ChevronRight, Brain, Zap, Info, Key, Loader2, MessageCircle, Send, Smartphone, X, Copy, QrCode, Sparkles } from 'lucide-react';
+import { Check, ChevronRight, Brain, Zap, Info, Key, Loader2, MessageCircle, Send, Smartphone, X, Copy, QrCode, Sparkles, Bot } from 'lucide-react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { supabase } from '@/lib/supabase';
@@ -114,6 +114,7 @@ export default function Onboarding() {
           },
           body: JSON.stringify({
             plan: 'free', // Start with free tier
+            intelligence,
           }),
         });
         

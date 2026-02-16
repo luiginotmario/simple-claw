@@ -43,10 +43,9 @@ runcmd:
     # Create OpenClaw directories and config
     - mkdir -p /home/openclaw/.openclaw
 
-    # Generate gateway token and full OpenClaw config
+    # Full OpenClaw config
     # Life OS provides ALL credentials - user does nothing
     - |
-        TOKEN=$(openssl rand -hex 32)
         cat > /home/openclaw/.openclaw/openclaw.json << 'OCCONFIG'
         {
           "gateway": {
@@ -60,15 +59,18 @@ runcmd:
             "trustedProxies": ["127.0.0.1", "::1"]
           },
           "llm": {
-            "provider": "openai",
-            "apiKey": "OPENAI_KEY_PLACEHOLDER",
-            "model": "gpt-4o-mini"
+            "provider": "LLM_PROVIDER_PLACEHOLDER",
+            "apiKey": "LLM_API_KEY_PLACEHOLDER",
+            "model": "LLM_MODEL_PLACEHOLDER"
           },
           "agent": {
-            "systemPrompt": "You are a helpful personal assistant with shopping superpowers. You can search for products, compare prices across 100+ retailers, track price changes over time, and provide direct purchase links. Start by asking the user their name and what they'd like you to help with. Be warm and conversational."
+            "systemPrompt": "You are a helpful personal assistant. Before performing any action on behalf of the user (sending, scheduling, purchasing, calling external services, or using tools), you MUST call the Usage Gate skill to check if the user has remaining free actions. If the gate returns blocked, do NOT perform the action. Instead, explain in a natural, context-aware way that completing this request requires upgrading to the $20/month plan, and offer to continue once they upgrade."
           },
           "skills": {
             "web_search": {
+              "enabled": true
+            },
+            "usage-gate": {
               "enabled": true
             },
             "price-tracker": {
@@ -81,9 +83,6 @@ runcmd:
           }
         }
         OCCONFIG
-        
-        # Replace placeholders (will be injected by provisioning script)
-        sed -i "s/GATEWAY_TOKEN_PLACEHOLDER/$TOKEN/g" /home/openclaw/.openclaw/openclaw.json
 
     # Install price-tracker skill
     - mkdir -p /home/openclaw/.openclaw/skills/price-tracker
@@ -149,6 +148,41 @@ runcmd:
         Use the `country` parameter: US, CA, BR, MX, UK, DE, FR, IT, ES, NL, SE, PL, AU, JP, IN, SG, AE, SA. Default: us.
         SKILLMD
 
+    # Install usage-gate skill
+    - mkdir -p /home/openclaw/.openclaw/skills/usage-gate
+    - |
+        cat > /home/openclaw/.openclaw/skills/usage-gate/SKILL.md << 'SKILLMD'
+        ---
+        name: usage-gate
+        description: Check whether a user is allowed to perform an action based on their plan usage.
+        metadata: {"openclaw":{"requires":{"env":["INSTANCE_TOKEN","LIFEOS_API_URL"]},"primaryEnv":"INSTANCE_TOKEN"}}
+        ---
+
+        ## Usage Gate
+
+        Before performing any action for the user, call the usage gate endpoint. Use `web_fetch`:
+
+            web_fetch({
+              url: "${LIFEOS_API_URL}/api/usage/check",
+              method: "POST",
+              headers: {
+                "Authorization": "Bearer ${INSTANCE_TOKEN}",
+                "Content-Type": "application/json"
+              },
+              body: "{}"
+            })
+
+        The response is JSON:
+        - `allowed`: boolean
+        - `shouldPay`: boolean
+        - `checkoutUrl`: string | null
+
+        If `allowed` is false:
+        - Do NOT perform the action.
+        - Reply to the user explaining they need to upgrade to continue, in a context-aware way.
+        - If `checkoutUrl` exists, include it in the response.
+        SKILLMD
+
     - chown -R openclaw:openclaw /home/openclaw
 
     # Create systemd service for OpenClaw (system-level for always-on)
@@ -166,6 +200,8 @@ runcmd:
         WorkingDirectory=/home/openclaw
         Environment=HOME=/home/openclaw
         Environment=NODE_ENV=production
+        Environment=INSTANCE_TOKEN=GATEWAY_TOKEN_PLACEHOLDER
+        Environment=LIFEOS_API_URL=LIFEOS_API_URL_PLACEHOLDER
         Environment=PRICESAPI_KEY=PRICESAPI_KEY_PLACEHOLDER
         ExecStart=/usr/bin/openclaw gateway --port 18789 --bind loopback
         Restart=always

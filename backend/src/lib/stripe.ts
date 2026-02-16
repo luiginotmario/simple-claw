@@ -1,6 +1,9 @@
 import Stripe from 'stripe';
 import { config } from '../config/index.js';
 import { logger } from './logger.js';
+import { createClient } from '@supabase/supabase-js';
+
+const supabase = createClient(config.SUPABASE_URL, config.SUPABASE_SERVICE_ROLE_KEY);
 
 export const stripe = new Stripe(config.STRIPE_SECRET_KEY, {
   apiVersion: '2024-12-18.acacia',
@@ -92,9 +95,11 @@ async function handleCheckoutComplete(session: Stripe.Checkout.Session) {
   }
   
   logger.info('User upgraded to Pro', { userId, customerId: session.customer });
-  
-  // This will be handled in the provisioning service
-  // to migrate user from shared → dedicated VPS
+
+  await supabase
+    .from('users')
+    .update({ subscription_status: 'active', stripe_customer_id: session.customer as string })
+    .eq('id', userId);
 }
 
 async function handleSubscriptionCancelled(subscription: Stripe.Subscription) {
@@ -102,5 +107,8 @@ async function handleSubscriptionCancelled(subscription: Stripe.Subscription) {
   
   logger.info('Subscription cancelled', { customerId });
   
-  // Downgrade user back to shared VPS
+  await supabase
+    .from('users')
+    .update({ subscription_status: 'canceled' })
+    .eq('stripe_customer_id', customerId);
 }

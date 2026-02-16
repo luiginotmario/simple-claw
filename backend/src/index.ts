@@ -6,6 +6,8 @@ import { logger } from './lib/logger.js';
 import { runMigrations } from './db/index.js';
 import provision from './routes/provision.js';
 import webhooks from './routes/webhooks.js';
+import usage from './routes/usage.js';
+import { startWhatsAppRouter } from './services/whatsapp.js';
 
 const app = new Hono();
 
@@ -29,6 +31,7 @@ app.get('/health', (c) => {
 // Routes
 app.route('/api/provision', provision);
 app.route('/api/webhooks', webhooks);
+app.route('/api/usage', usage);
 
 // 404 handler
 app.notFound((c) => {
@@ -52,6 +55,10 @@ async function startServer() {
   logger.info('Starting Life OS Backend', {
     port,
     env: config.NODE_ENV,
+  });
+
+  startWhatsAppRouter().catch((error) => {
+    logger.error('WhatsApp router failed to start', error);
   });
   
   const { serve } = await import('@hono/node-server');

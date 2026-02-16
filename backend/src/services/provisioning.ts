@@ -11,6 +11,7 @@ export interface ProvisionRequest {
   userId: string;
   plan: 'free' | 'pro';
   email: string;
+  intelligence?: 'default' | 'claude' | 'gemini' | 'gpt4';
 }
 
 export interface ProvisionResult {
@@ -23,17 +24,13 @@ export interface ProvisionResult {
 /**
  * SECURITY ARCHITECTURE EXPLAINED:
  * 
- * Free Tier (Shared VPS):
- * - 10-20 users per CPX31 server (4 vCPU, 8GB RAM)
- * - Each user gets isolated Docker container with resource limits
- * - No IP-level isolation, but process isolation via containers
- * - Gateway token still required for API access
- * - Suitable for trial users (5 actions limit)
- * 
- * Pro Tier (Dedicated VPS):
+ * Free Tier (Dedicated VPS + Usage Limit):
  * - 1 user per CPX11 server (2 vCPU, 2GB RAM)
- * - Full OS-level isolation
- * - Dedicated IP address
+ * - Same instance persists before/after payment
+ * - Free tier is enforced by action limits (server remains the same)
+ *
+ * Pro Tier:
+ * - Same VPS as free tier, unlimited actions once paid
  * - OpenClaw binds to 127.0.0.1:18789 (NEVER exposed publicly)
  * - UFW firewall blocks port 18789 from internet
  * - Nginx reverse proxy on port 443 (HTTPS only)
@@ -66,24 +63,18 @@ export const provisioningService = {
       
       // 2. Generate secure gateway token
       const gatewayToken = generateGatewayToken();
+
+      // 2b. Resolve LLM configuration
+      const { llmProvider, llmModel } = getLlmConfig(req.intelligence);
       
-      // 3. Create or assign server based on plan
-      let serverInfo;
-      let subdomain;
-      
-      if (req.plan === 'pro') {
-        // Dedicated VPS for Pro users
-        serverInfo = await hetzner.createDedicatedServer({
-          userId: req.userId,
-          plan: req.plan,
-          gatewayToken,
-        });
-        subdomain = `agent-${nanoid(10)}`;
-      } else {
-        // Shared VPS for Free tier users
-        serverInfo = await hetzner.getOrCreateSharedServer();
-        subdomain = `agent-free-${nanoid(10)}`;
-      }
+      // 3. Create a dedicated server per user (free tier is usage-limited)
+      const serverInfo = await hetzner.createDedicatedServer({
+        userId: req.userId,
+        gatewayToken,
+        llmProvider,
+        llmModel,
+      });
+      const subdomain = `agent-${nanoid(10)}`;
       
       // 4. Create DNS record
       const agentUrl = await cloudflare.createDNSRecord(subdomain, serverInfo.ipv4);
@@ -95,6 +86,8 @@ export const provisioningService = {
         instance_status: 'active',
         gateway_token: gatewayToken,
         agent_url: `https://${agentUrl}`,
+        llm_provider: llmProvider,
+        llm_model: llmModel,
       }).eq('id', req.userId);
       
       // 6. Initialize action counter for free tier
@@ -137,34 +130,11 @@ export const provisioningService = {
   },
   
   /**
-   * Migrate user from free (shared) to pro (dedicated)
+   * Upgrade user to Pro (same VPS, removes usage limit)
    */
   async upgradeUserToPro(userId: string): Promise<void> {
     logger.info('Upgrading user to Pro', { userId });
     
-    // Get current user data
-    const { data: user } = await supabase
-      .from('users')
-      .select('*')
-      .eq('id', userId)
-      .single();
-    
-    if (!user) {
-      throw new Error('User not found');
-    }
-    
-    // Provision new dedicated server
-    const result = await this.provisionAgent({
-      userId,
-      plan: 'pro',
-      email: user.email,
-    });
-    
-    if (!result.success) {
-      throw new Error('Failed to provision Pro server');
-    }
-    
-    // Update subscription status
     await supabase
       .from('users')
       .update({ subscription_status: 'active' })
@@ -176,7 +146,17 @@ export const provisioningService = {
   /**
    * Track action usage and trigger payment if limit exceeded
    */
-  async trackAction(userId: string): Promise<{ shouldPay: boolean; checkoutUrl?: string }> {
+  async trackAction(userId: string): Promise<{ shouldPay: boolean; checkoutUrl?: string; blocked?: boolean }> {
+    const { data: user } = await supabase
+      .from('users')
+      .select('subscription_status')
+      .eq('id', userId)
+      .single();
+    
+    if (user?.subscription_status === 'active') {
+      return { shouldPay: false };
+    }
+    
     const { data: usage } = await supabase
       .from('user_usage')
       .select('*')
@@ -192,19 +172,20 @@ export const provisioningService = {
     
     await supabase
       .from('user_usage')
-      .update({ action_count: newCount })
+      .update({ action_count: newCount, last_action_at: new Date().toISOString() })
       .eq('user_id', userId);
     
     logger.info('Action tracked', { userId, actionCount: newCount });
     
-    // If user hits 5 actions, create Stripe checkout
-    if (newCount === 5) {
+    // If user hits or exceeds 5 actions, create Stripe checkout and block further usage
+    if (newCount >= 5) {
       const { stripeService } = await import('../lib/stripe.js');
       const checkoutUrl = await stripeService.checkUsageLimitAndCreateCheckout(userId, newCount);
       
       return {
         shouldPay: true,
         checkoutUrl: checkoutUrl || undefined,
+        blocked: true,
       };
     }
     
@@ -216,4 +197,18 @@ function generateGatewayToken(): string {
   return Array.from(crypto.getRandomValues(new Uint8Array(32)))
     .map(b => b.toString(16).padStart(2, '0'))
     .join('');
+}
+
+function getLlmConfig(intelligence?: 'default' | 'claude' | 'gemini' | 'gpt4'): { llmProvider: string; llmModel: string } {
+  switch (intelligence) {
+    case 'claude':
+      return { llmProvider: 'openrouter', llmModel: 'anthropic/claude-3.5-sonnet' };
+    case 'gemini':
+      return { llmProvider: 'openrouter', llmModel: 'google/gemini-1.5-pro' };
+    case 'gpt4':
+      return { llmProvider: 'openrouter', llmModel: 'openai/gpt-4o' };
+    case 'default':
+    default:
+      return { llmProvider: 'openrouter', llmModel: 'openai/gpt-4o-mini' };
+  }
 }

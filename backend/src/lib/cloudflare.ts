@@ -24,7 +24,7 @@ export const cloudflare = {
         name: subdomain,
         content: ipv4,
         ttl: 120, // 2 minutes for faster propagation
-        proxied: false, // Direct IP, not proxied through Cloudflare
+        proxied: true, // Enable Cloudflare proxy for HTTPS encryption
       });
       
       const fullDomain = `${subdomain}.${config.CLOUDFLARE_DOMAIN}`;

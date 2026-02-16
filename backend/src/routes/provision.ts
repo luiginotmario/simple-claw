@@ -17,7 +17,7 @@ provision.post('/', async (c) => {
   const userEmail = c.get('userEmail');
   try {
     const body = await c.req.json();
-    const { plan } = body;
+    const { plan, intelligence } = body;
     
     if (!plan || !['free', 'pro'].includes(plan)) {
       return c.json({ error: 'Invalid plan' }, 400);
@@ -27,6 +27,7 @@ provision.post('/', async (c) => {
       userId,
       plan,
       email: userEmail,
+      intelligence,
     });
     
     if (!result.success) {

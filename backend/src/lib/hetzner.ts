@@ -23,12 +23,13 @@ const cloudInitTemplate = readFileSync(
 );
 
 // Life OS master API keys (shared across all users)
-const LIFE_OS_OPENAI_KEY = config.OPENAI_API_KEY || process.env.OPENAI_API_KEY;
+const LIFE_OS_OPENROUTER_KEY = config.OPENROUTER_API_KEY;
 
 export interface CreateServerParams {
   userId: string;
-  plan: 'free' | 'pro';
   gatewayToken: string;
+  llmProvider: string;
+  llmModel: string;
 }
 
 export interface ServerInfo {
@@ -48,18 +49,21 @@ export interface ServerInfo {
  */
 export const hetzner = {
   /**
-   * Create a dedicated VPS for Pro users
+   * Create a dedicated VPS for a user
    */
   async createDedicatedServer(params: CreateServerParams): Promise<ServerInfo> {
-    logger.info('Creating dedicated Hetzner server', { userId: params.userId, plan: params.plan });
+    logger.info('Creating dedicated Hetzner server', { userId: params.userId });
     
     try {
       // Inject Life OS credentials into cloud-init
       const userData = cloudInitTemplate
         .replace('YOUR_PASSWORD_HERE', generateSecurePassword())
-        .replace('OPENAI_KEY_PLACEHOLDER', LIFE_OS_OPENAI_KEY)
+        .replace('LLM_API_KEY_PLACEHOLDER', LIFE_OS_OPENROUTER_KEY)
+        .replace('LLM_PROVIDER_PLACEHOLDER', params.llmProvider)
+        .replace('LLM_MODEL_PLACEHOLDER', params.llmModel)
         .replace('GATEWAY_TOKEN_PLACEHOLDER', params.gatewayToken)
-        .replace('PRICESAPI_KEY_PLACEHOLDER', config.PRICESAPI_KEY || '');
+        .replace('PRICESAPI_KEY_PLACEHOLDER', config.PRICESAPI_KEY || '')
+        .replace('LIFEOS_API_URL_PLACEHOLDER', config.LIFEOS_API_URL);
       
       const response = await hetznerApi.post('/servers', {
         name: `lifeos-${params.userId.slice(0, 8)}`,
@@ -69,7 +73,6 @@ export const hetzner = {
         user_data: userData,
         labels: {
           user_id: params.userId,
-          plan: params.plan,
           service: 'lifeos',
         },
       });
@@ -90,66 +93,6 @@ export const hetzner = {
       };
     } catch (error: any) {
       logger.error('Failed to create Hetzner server', error, { userId: params.userId });
-      throw new Error(`Hetzner API error: ${error.response?.data?.error?.message || error.message}`);
-    }
-  },
-  
-  /**
-   * Create a shared VPS for free tier users
-   * Multiple users run OpenClaw instances on same server with resource limits
-   */
-  async getOrCreateSharedServer(): Promise<ServerInfo> {
-    logger.info('Getting or creating shared server for free tier');
-    
-    try {
-      // Check for existing shared server with capacity
-      const serversResponse = await hetznerApi.get('/servers', {
-        params: {
-          label_selector: 'service=lifeos,tier=shared',
-        },
-      });
-      
-      const servers = serversResponse.data.servers;
-      
-      // Find a server with < 20 users
-      for (const server of servers) {
-        const userCount = parseInt(server.labels.user_count || '0');
-        if (userCount < 20) {
-          logger.info('Using existing shared server', { serverId: server.id, userCount });
-          return {
-            id: server.id,
-            name: server.name,
-            ipv4: server.public_net.ipv4.ip,
-            status: server.status,
-          };
-        }
-      }
-      
-      // Create new shared server if none available
-      logger.info('Creating new shared server');
-      const response = await hetznerApi.post('/servers', {
-        name: `lifeos-shared-${Date.now()}`,
-        server_type: 'cpx31', // 4 vCPU, 8GB RAM - can handle 20 users
-        image: 'ubuntu-22.04',
-        location: 'nbg1',
-        user_data: cloudInitTemplate.replace('YOUR_PASSWORD_HERE', generateSecurePassword()),
-        labels: {
-          service: 'lifeos',
-          tier: 'shared',
-          user_count: '0',
-        },
-      });
-      
-      const server = response.data.server;
-      
-      return {
-        id: server.id,
-        name: server.name,
-        ipv4: server.public_net.ipv4.ip,
-        status: server.status,
-      };
-    } catch (error: any) {
-      logger.error('Failed to get/create shared server', error);
       throw new Error(`Hetzner API error: ${error.response?.data?.error?.message || error.message}`);
     }
   },

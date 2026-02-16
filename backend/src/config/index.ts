@@ -28,10 +28,19 @@ const envSchema = z.object({
   ENCRYPTION_KEY: z.string().min(32),
   
   // Life OS Master API Keys (shared across all users)
-  OPENAI_API_KEY: z.string(), // Life OS's OpenAI key
+  OPENAI_API_KEY: z.string().optional(), // Optional, if using OpenAI directly
+  OPENROUTER_API_KEY: z.string(), // Life OS's OpenRouter key
+
+  // Public API URL (for instance callbacks)
+  LIFEOS_API_URL: z.string().url(),
 
   // PricesAPI (shopping & price tracking)
   PRICESAPI_KEY: z.string().optional().default('pricesapi_oh02deGgi7W9JV2vASHdOVTS7SbLXV'),
+
+  // WhatsApp (Baileys) Router
+  WHATSAPP_ENABLED: z.enum(['true', 'false']).default('false'),
+  WHATSAPP_AUTH_DIR: z.string().default('./.whatsapp'),
+  AGENT_WEBHOOK_PATH: z.string().default('/webhook'),
   
   // Server
   PORT: z.string().default('3001'),

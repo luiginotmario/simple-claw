@@ -8,6 +8,10 @@ create table public.users (
   full_name text,
   avatar_url text,
   stripe_customer_id text,
+  gateway_token text,
+  agent_url text,
+  llm_provider text,
+  llm_model text,
   subscription_status text default 'inactive', -- active, past_due, canceled
   instance_status text default 'none', -- provisioning, active, error, stopped
   instance_ip text,

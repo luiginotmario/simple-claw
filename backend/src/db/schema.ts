@@ -12,6 +12,8 @@ export const users = pgTable('users', {
   instance_id: text('instance_id'),
   gateway_token: text('gateway_token'),
   agent_url: text('agent_url'),
+  llm_provider: text('llm_provider'),
+  llm_model: text('llm_model'),
   created_at: timestamp('created_at').defaultNow().notNull(),
 });
 
@@ -48,4 +50,14 @@ export const instance_heartbeats = pgTable('instance_heartbeats', {
   memory_usage: integer('memory_usage'),
   version: text('version'),
   status: text('status'),
+});
+
+export const messaging_integrations = pgTable('messaging_integrations', {
+  id: uuid('id').defaultRandom().primaryKey(),
+  user_id: uuid('user_id').notNull().references(() => users.id),
+  platform: text('platform').notNull(), // 'whatsapp', 'telegram'
+  platform_user_id: text('platform_user_id').notNull(), // Phone number for WhatsApp, chat_id for Telegram
+  is_active: boolean('is_active').default(true).notNull(),
+  linked_at: timestamp('linked_at').defaultNow().notNull(),
+  created_at: timestamp('created_at').defaultNow().notNull(),
 });
